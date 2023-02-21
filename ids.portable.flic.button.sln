@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.3.32929.385
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ids.portable.flic.button", "src\ids.portable.flic.button\ids.portable.flic.button.csproj", "{622588E1-F7C6-43C3-A21E-B23EF18DD7C6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ids.portable.flic.button.Android", "src\ids.portable.flic.button.Android\ids.portable.flic.button.Android.csproj", "{C8C58680-07AE-43CA-8DC5-EE65213FF572}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{622588E1-F7C6-43C3-A21E-B23EF18DD7C6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{622588E1-F7C6-43C3-A21E-B23EF18DD7C6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{622588E1-F7C6-43C3-A21E-B23EF18DD7C6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{622588E1-F7C6-43C3-A21E-B23EF18DD7C6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C8C58680-07AE-43CA-8DC5-EE65213FF572}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C8C58680-07AE-43CA-8DC5-EE65213FF572}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C8C58680-07AE-43CA-8DC5-EE65213FF572}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C8C58680-07AE-43CA-8DC5-EE65213FF572}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {CF144AEA-99CF-4CE7-B89E-A0A6798BAEED}
+	EndGlobalSection
+EndGlobal
