@@ -28,6 +28,8 @@ namespace IDS.Portable.Flic.Button.Platforms.Shared
 
     public struct FlicButtonEventData
     {
+        public bool Connected;
+
         public long Timestamp;
         public bool WasQueued;
         public bool LastQueued;

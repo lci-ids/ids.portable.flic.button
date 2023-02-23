@@ -29,6 +29,10 @@ namespace IDS.Portable.Flic.Button.Platforms.Android
         {
             base.OnDisconnect(button);
             TaggedLog.Debug(LogTag, $"Button disconnected.");
+
+            _flicEventData.Connected = false;
+
+            _flicEvent.Invoke(_flicEventData);
         }
 
         public override void OnReady(Flic2Button button, long timestamp)
@@ -37,6 +41,8 @@ namespace IDS.Portable.Flic.Button.Platforms.Android
 
             // Connected and ready to go.
             TaggedLog.Debug(LogTag, $"Button connected and ready.");
+
+            _flicEventData.Connected = true;
 
             _flicEvent.Invoke(_flicEventData);
         }
