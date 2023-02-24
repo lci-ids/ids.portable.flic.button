@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading.Tasks;
 using System.Threading;
 
@@ -20,10 +20,10 @@ namespace IDS.Portable.Flic.Button.Platforms.Shared
             Uuid = uuid;
         }
 
-        private string SerialNumber;
-        private string MacAddress;
-        private int FirmwareVersion;
-        private string Uuid;
+        public string SerialNumber;
+        public string MacAddress;
+        public int FirmwareVersion;
+        public string Uuid;
     }
 
     public struct FlicButtonEventData
