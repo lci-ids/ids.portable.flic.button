@@ -22,11 +22,11 @@ namespace IDS.Portable.Flic.Button.Platforms.Android
 
             if (button is null)
             {
-                _tcs.SetResult(null);
+                // OnComplete will take care of cleaning up the TCS.
                 return;
             }
 
-            _tcs.SetResult(new FlicButtonDeviceData(button.SerialNumber, button.BdAddr, button.FirmwareVersion, button.Uuid));
+            _tcs.TrySetResult(new FlicButtonDeviceData(button.SerialNumber, button.BdAddr, button.FirmwareVersion, button.Uuid));
         }
 
         public void OnDiscovered(string? bdAddr)
@@ -43,19 +43,23 @@ namespace IDS.Portable.Flic.Button.Platforms.Android
 
         public void OnComplete(int result, int subCode, Flic2Button? button)
         {
+            // We already have a result (button is already paired).
+            if (_tcs.Task.IsCompleted)
+                return;
+            
             if (button is not null && result == Flic2ScanCallback.ResultSuccess)
             {
                 // We're paired, the button is good to go.
                 TaggedLog.Debug(LogTag, $"Pair result success, ready to go.");
 
-                _tcs.SetResult(new FlicButtonDeviceData(button.SerialNumber, button.BdAddr, button.FirmwareVersion, button.Uuid));
+                _tcs.TrySetResult(new FlicButtonDeviceData(button.SerialNumber, button.BdAddr, button.FirmwareVersion, button.Uuid));
             }
             else
             {
                 // Failure.
                 TaggedLog.Debug(LogTag, $"Failed to pair, result: {result} subCode: {subCode}.");
 
-                _tcs.SetResult(null);
+                _tcs.TrySetResult(null);
             }
         }
     }
