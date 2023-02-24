@@ -12,14 +12,16 @@ namespace IDS.Portable.Flic.Button.Platforms.Shared
 
     public struct FlicButtonDeviceData
     {
-        public FlicButtonDeviceData(string serialNumber, string macAddress, int firmwareVersion, string uuid)
+        public FlicButtonDeviceData(string name, string serialNumber, string macAddress, int firmwareVersion, string uuid)
         {
+            Name = name;
             SerialNumber = serialNumber;
             MacAddress = macAddress;
             FirmwareVersion = firmwareVersion;
             Uuid = uuid;
         }
 
+        public string Name;
         public string SerialNumber;
         public string MacAddress;
         public int FirmwareVersion;

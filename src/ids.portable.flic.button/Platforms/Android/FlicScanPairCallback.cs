@@ -52,7 +52,7 @@ namespace IDS.Portable.Flic.Button.Platforms.Android
                 // We're paired, the button is good to go.
                 TaggedLog.Debug(LogTag, $"Pair result success, ready to go.");
 
-                _tcs.TrySetResult(new FlicButtonDeviceData(button.SerialNumber, button.BdAddr, button.FirmwareVersion, button.Uuid));
+                _tcs.TrySetResult(new FlicButtonDeviceData(button.Name, button.SerialNumber, button.BdAddr, button.FirmwareVersion, button.Uuid));
             }
             else
             {
