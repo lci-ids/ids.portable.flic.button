@@ -26,7 +26,7 @@ namespace IDS.Portable.Flic.Button.Platforms.Android
                 return;
             }
 
-            _tcs.TrySetResult(new FlicButtonDeviceData(button.SerialNumber, button.BdAddr, button.FirmwareVersion, button.Uuid));
+            _tcs.TrySetResult(new FlicButtonDeviceData(button.Name, button.SerialNumber, button.BdAddr, button.FirmwareVersion, button.Uuid));
         }
 
         public void OnDiscovered(string? bdAddr)
@@ -57,7 +57,7 @@ namespace IDS.Portable.Flic.Button.Platforms.Android
             else
             {
                 // Failure.
-                TaggedLog.Debug(LogTag, $"Failed to pair, result: {result} subCode: {subCode}.");
+                TaggedLog.Error(LogTag, $"Failed to pair, result: {result} subCode: {subCode}.");
 
                 _tcs.TrySetResult(null);
             }
