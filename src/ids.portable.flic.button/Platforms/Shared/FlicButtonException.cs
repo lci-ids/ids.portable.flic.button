@@ -24,4 +24,10 @@ namespace IDS.Portable.Flic.Button.Platforms.Shared
         {
         }
     }
+    public class FlicConnectionTimeoutException : FlicButtonException
+    {
+        public FlicConnectionTimeoutException(string message, Exception? innerException = null) : base(message, innerException)
+        {
+        }
+    }
 }

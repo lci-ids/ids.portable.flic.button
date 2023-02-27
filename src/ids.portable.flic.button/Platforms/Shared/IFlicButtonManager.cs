@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading.Tasks;
 using System.Threading;
 
@@ -12,22 +12,26 @@ namespace IDS.Portable.Flic.Button.Platforms.Shared
 
     public struct FlicButtonDeviceData
     {
-        public FlicButtonDeviceData(string serialNumber, string macAddress, int firmwareVersion, string uuid)
+        public FlicButtonDeviceData(string name, string serialNumber, string macAddress, int firmwareVersion, string uuid)
         {
+            Name = name;
             SerialNumber = serialNumber;
             MacAddress = macAddress;
             FirmwareVersion = firmwareVersion;
             Uuid = uuid;
         }
 
-        private string SerialNumber;
-        private string MacAddress;
-        private int FirmwareVersion;
-        private string Uuid;
+        public string Name;
+        public string SerialNumber;
+        public string MacAddress;
+        public int FirmwareVersion;
+        public string Uuid;
     }
 
     public struct FlicButtonEventData
     {
+        public bool Connected;
+
         public long Timestamp;
         public bool WasQueued;
         public bool LastQueued;
