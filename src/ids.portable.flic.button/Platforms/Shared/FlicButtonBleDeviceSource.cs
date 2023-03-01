@@ -43,6 +43,13 @@ public class FlicButtonBleDeviceSource : CommonDisposable, IFlicButtonBleDeviceS
     }
     public IEnumerable<IFlicButtonBleDeviceDriver> SensorDevices => _registeredFlicButtons.Values;
 
+    /// <summary>
+    /// Flic Button is an optional accessory, so it needs to be registered separately from other devices. The
+    /// following calls need to be made in the app layer while registering other accessories:
+    /// 
+    /// Resolver<IFlicButtonBleDeviceSource>.LazyConstructAndRegister(() => new FlicButtonBleDeviceSource(Resolver<ILogicalDeviceService>.Resolve));
+    /// AccessoryRegistration.FlicButtonBleDeviceSource = Resolver<IFlicButtonBleDeviceSource>.Resolve;
+    /// </summary>
     public FlicButtonBleDeviceSource(ILogicalDeviceService deviceService, string deviceSourceToken = DeviceSourceTokenDefault)
     {
         DeviceService = deviceService;
