@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ids.portable.flic.button", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ids.portable.flic.button.Android", "src\ids.portable.flic.button.Android\ids.portable.flic.button.Android.csproj", "{C8C58680-07AE-43CA-8DC5-EE65213FF572}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ids.portable.flic.button.ios", "src\ids.portable.flic.button.ios\ids.portable.flic.button.ios.csproj", "{D99F79E6-C8D7-4A56-944C-FB4C60A23513}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{C8C58680-07AE-43CA-8DC5-EE65213FF572}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C8C58680-07AE-43CA-8DC5-EE65213FF572}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C8C58680-07AE-43CA-8DC5-EE65213FF572}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D99F79E6-C8D7-4A56-944C-FB4C60A23513}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D99F79E6-C8D7-4A56-944C-FB4C60A23513}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D99F79E6-C8D7-4A56-944C-FB4C60A23513}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D99F79E6-C8D7-4A56-944C-FB4C60A23513}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
