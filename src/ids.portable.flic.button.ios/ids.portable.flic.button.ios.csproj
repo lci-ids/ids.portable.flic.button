@@ -7,9 +7,9 @@
     <ProjectGuid>{D99F79E6-C8D7-4A56-944C-FB4C60A23513}</ProjectGuid>
     <TemplateGuid>{b6f3ff35-79b2-4f25-a2fc-60a7cf61013b}</TemplateGuid>
     <OutputType>Library</OutputType>
-    <RootNamespace>NativeLibrary</RootNamespace>
+    <RootNamespace>FlicLibraryIos</RootNamespace>
     <IPhoneResourcePrefix>Resources</IPhoneResourcePrefix>
-    <AssemblyName>NativeLibrary</AssemblyName>
+    <AssemblyName>FlicLibraryIos</AssemblyName>
     <RestoreProjectStyle>PackageReference</RestoreProjectStyle>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">

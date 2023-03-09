@@ -1,7 +1,7 @@
 ﻿using System;
 using ObjCRuntime;
 
-namespace FLICButtoniOS
+namespace FlicLibraryIos
 {
     [Native]
     public enum FLICManagerState : long

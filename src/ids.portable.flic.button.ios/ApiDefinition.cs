@@ -4,7 +4,7 @@ using Foundation;
 using UIKit;
 using ObjCRuntime;
 
-namespace FLICButtoniOS
+namespace FlicLibraryIos
 {
     [Static]
     interface Constants
