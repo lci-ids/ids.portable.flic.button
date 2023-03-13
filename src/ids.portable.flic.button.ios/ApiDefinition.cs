@@ -1,8 +1,7 @@
-﻿using System;
+using System;
 using ObjCRuntime;
 using Foundation;
 using UIKit;
-using ObjCRuntime;
 
 namespace FlicLibraryIos
 {
@@ -130,7 +129,7 @@ namespace FlicLibraryIos
 
         // @optional -(void)button:(FLICButton * _Nonnull)button didReceiveButtonDown:(BOOL)queued age:(NSInteger)age;
         [Export("button:didReceiveButtonDown:age:")]
-        void Button(FLICButton button, bool queued, nint age);
+        void ButtonDidReceiveButtonDown(FLICButton button, bool queued, nint age);
 
         // @optional -(void)button:(FLICButton * _Nonnull)button didReceiveButtonUp:(BOOL)queued age:(NSInteger)age;
         [Export("button:didReceiveButtonUp:age:")]

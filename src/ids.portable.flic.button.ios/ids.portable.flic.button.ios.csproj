@@ -49,6 +49,7 @@
   <ItemGroup>
     <NativeReference Include="Native References/flic2lib.framework">
       <Kind>Framework</Kind>
+      <SmartLink>True</SmartLink>
     </NativeReference>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.ObjCBinding.CSharp.targets" />
