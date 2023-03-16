@@ -18,6 +18,13 @@ namespace IDS.Portable.Flic.Button.Platforms.Shared
         }
     }
 
+    public class FlicButtonManagerNotReadyException : FlicButtonException
+    {
+        public FlicButtonManagerNotReadyException(Exception? innerException = null) : base("Flic Button manager is not yet ready, make ConfigureWithDelegate has been called.", innerException)
+        {
+        }
+    }
+
     public class FlicButtonNullException : FlicButtonException
     {
         public FlicButtonNullException(string message, Exception? innerException = null) : base(message, innerException)

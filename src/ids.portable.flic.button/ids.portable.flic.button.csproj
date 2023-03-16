@@ -74,9 +74,10 @@
     <Compile Include="Platforms\Shared\**\*.cs" />
     <Compile Include="Platforms\iOS\**\*.cs" />
 
-    <ProjectReference Include="..\ids.portable.flic.button.ios\ids.portable.flic.button.ios.csproj">
-      <PrivateAssets>all</PrivateAssets>
-    </ProjectReference>
+    <Reference Include="FlicLibraryIos">
+      <HintPath>..\ids.portable.flic.button.ios.library\FlicLibraryIos.dll</HintPath>
+    </Reference>
+
   </ItemGroup>
 
   <ItemGroup>

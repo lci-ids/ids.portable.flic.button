@@ -1,10 +1,8 @@
 ﻿using Foundation;
 using System;
-using System.Collections.Generic;
-using System.Text;
 using IDS.Portable.Flic.Button.Platforms.Shared;
 using IDS.Portable.Common;
-using System.Collections;
+using FlicLibraryIos;
 
 namespace IDS.Portable.Flic.Button.Platforms.iOS
 {
@@ -21,15 +19,12 @@ namespace IDS.Portable.Flic.Button.Platforms.iOS
 
         public override void ButtonDidConnect(FLICButton button)
         {
-            base.ButtonDidConnect(button);
             // Connected but not necessarily ready yet.
             TaggedLog.Debug(LogTag, $"Button connected.");
         }
 
         public override void ButtonIsReady(FLICButton button)
         {
-            base.ButtonIsReady(button);
-
             // Connected and ready to go.
             TaggedLog.Debug(LogTag, $"Button connected and ready.");
 
@@ -38,11 +33,9 @@ namespace IDS.Portable.Flic.Button.Platforms.iOS
             _flicEvent.Invoke(_flicEventData);
         }
 
-        // TODO: What does this error map to?
         public override void ButtonDidDisconnectWithError(FLICButton button, NSError? error)
         {
-            base.ButtonDidDisconnectWithError(button, error);
-            TaggedLog.Debug(LogTag, $"Button disconnected.");
+            TaggedLog.Debug(LogTag, $"Button disconnected with error: {error}.");
 
             _flicEventData.Connected = false;
 
@@ -51,124 +44,92 @@ namespace IDS.Portable.Flic.Button.Platforms.iOS
 
         public override void ButtonDidFailToConnectWithError(FLICButton button, NSError? error)
         {
-            base.ButtonDidFailToConnectWithError(button, error);
-            TaggedLog.Debug(LogTag, $"Button failed to connect.");
+            TaggedLog.Debug(LogTag, $"Button failed to connect: {error}.");
 
             _flicEventData.Connected = false;
 
             _flicEvent.Invoke(_flicEventData);
         }
 
-        // TODO: Finish everything below.
-        public override void ButtonDidReceiveButtonDown(FLICButton button, bool queued, int age)
+        public override void ButtonDidReceiveButtonClick(FLICButton button, bool queued, nint age)
         {
-            base.ButtonDidReceiveButtonDown(button, queued, age);
-            TaggedLog.Debug(LogTag, $"ButtonDidReceiveButtonDown: .");
+            TaggedLog.Debug(LogTag, $"ButtonDidReceiveButtonClick.");
 
-            _flicEventData.WasQueued = wasQueued;
-            _flicEventData.LastQueued = lastQueued;
-            _flicEventData.Timestamp = timestamp;
-            _flicEventData.IsClick = isClick;
-            _flicEventData.IsHold = isHold;
+            _flicEventData.WasQueued = queued;
+            _flicEventData.Timestamp = age;
+            _flicEventData.IsSingleClick = true;
+            _flicEventData.IsDoubleClick = false;
 
             _flicEvent.Invoke(_flicEventData);
         }
 
-
-        public override void ButtonDidReceiveButtonUp(FLICButton button, bool queued, int age)
+        public override void ButtonDidReceiveButtonDoubleClick(FLICButton button, bool queued, nint age)
         {
-            base.ButtonDidReceiveButtonUp(button, queued, age);
-            TaggedLog.Debug(LogTag, $"ButtonDidReceiveButtonUp: .");
+            TaggedLog.Debug(LogTag, $"ButtonDidReceiveButtonDoubleClick.");
 
-            _flicEventData.WasQueued = wasQueued;
-            _flicEventData.LastQueued = lastQueued;
-            _flicEventData.Timestamp = timestamp;
-            _flicEventData.IsClick = isClick;
-            _flicEventData.IsHold = isHold;
+            _flicEventData.WasQueued = queued;
+            _flicEventData.Timestamp = age;
+            _flicEventData.IsDoubleClick = true;
+            _flicEventData.IsSingleClick = false;
 
             _flicEvent.Invoke(_flicEventData);
         }
 
-        public override void ButtonDidReceiveButtonClick(FLICButton button, bool queued, int age)
+        public override void ButtonDidReceiveButtonDown(FLICButton button, bool queued, nint age)
         {
-            base.ButtonDidReceiveButtonClick(button, queued, age);
-            TaggedLog.Debug(LogTag, $"ButtonDidReceiveButtonClick: .");
+            TaggedLog.Debug(LogTag, $"ButtonDidReceiveButtonDown.");
 
-            _flicEventData.WasQueued = wasQueued;
-            _flicEventData.LastQueued = lastQueued;
-            _flicEventData.Timestamp = timestamp;
-            _flicEventData.IsClick = isClick;
-            _flicEventData.IsHold = isHold;
+            _flicEventData.WasQueued = queued;
+            _flicEventData.Timestamp = age;
+            _flicEventData.IsDown = true;
 
             _flicEvent.Invoke(_flicEventData);
         }
 
-        public override void ButtonDidReceiveButtonDoubleClick(FLICButton button, bool queued, int age)
+        public override void ButtonDidReceiveButtonHold(FLICButton button, bool queued, nint age)
         {
-            base.ButtonDidReceiveButtonDoubleClick(button, queued, age);
-            TaggedLog.Debug(LogTag, $"ButtonDidReceiveButtonDoubleClick: .");
+            TaggedLog.Debug(LogTag, $"ButtonDidReceiveButtonHold.");
 
-            _flicEventData.WasQueued = wasQueued;
-            _flicEventData.LastQueued = lastQueued;
-            _flicEventData.Timestamp = timestamp;
-            _flicEventData.IsClick = isClick;
-            _flicEventData.IsHold = isHold;
+            _flicEventData.WasQueued = queued;
+            _flicEventData.Timestamp = age;
+            _flicEventData.IsHold = true;
 
             _flicEvent.Invoke(_flicEventData);
         }
 
-        public override void ButtonDidReceiveButtonHold(FLICButton button, bool queued, int age)
+        public override void ButtonDidReceiveButtonUp(FLICButton button, bool queued, nint age)
         {
-            base.ButtonDidReceiveButtonHold(button, queued, age);
-            TaggedLog.Debug(LogTag, $"ButtonDidReceiveButtonHold: .");
+            TaggedLog.Debug(LogTag, $"ButtonDidReceiveButtonUp.");
 
-            _flicEventData.WasQueued = wasQueued;
-            _flicEventData.LastQueued = lastQueued;
-            _flicEventData.Timestamp = timestamp;
-            _flicEventData.IsClick = isClick;
-            _flicEventData.IsHold = isHold;
+            _flicEventData.WasQueued = queued;
+            _flicEventData.Timestamp = age;
+            _flicEventData.IsDown = false;
+            _flicEventData.IsHold = false;
 
             _flicEvent.Invoke(_flicEventData);
         }
 
         public override void ButtonDidUnpairWithError(FLICButton button, NSError? error)
         {
-            base.ButtonDidUnpairWithError(button, error);
-            TaggedLog.Debug(LogTag, $"ButtonDidUnpairWithError: .");
+            TaggedLog.Debug(LogTag, $"ButtonDidUnpairWithError: {error}.");
 
-            _flicEventData.WasQueued = wasQueued;
-            _flicEventData.LastQueued = lastQueued;
-            _flicEventData.Timestamp = timestamp;
-            _flicEventData.IsClick = isClick;
-            _flicEventData.IsHold = isHold;
+            _flicEventData.Connected = false;
 
             _flicEvent.Invoke(_flicEventData);
         }
 
         public override void ButtonDidUpdateBatteryVoltage(FLICButton button, float voltage)
         {
-            base.ButtonDidUpdateBatteryVoltage(button, voltage);
-            TaggedLog.Debug(LogTag, $"ButtonDidUpdateBatteryVoltage: .");
+            TaggedLog.Debug(LogTag, $"ButtonDidUpdateBatteryVoltage: {voltage}.");
 
-            _flicEventData.WasQueued = wasQueued;
-            _flicEventData.LastQueued = lastQueued;
-            _flicEventData.Timestamp = timestamp;
-            _flicEventData.IsClick = isClick;
-            _flicEventData.IsHold = isHold;
+            _flicEventData.BatteryVoltage = voltage;
 
             _flicEvent.Invoke(_flicEventData);
         }
 
         public override void ButtonDidUpdateNickname(FLICButton button, string nickname)
         {
-            base.ButtonDidReceiveButtonDown(button, nickname);
-            TaggedLog.Debug(LogTag, $"ButtonDidReceiveButtonDown: .");
-
-            _flicEventData.WasQueued = wasQueued;
-            _flicEventData.LastQueued = lastQueued;
-            _flicEventData.Timestamp = timestamp;
-            _flicEventData.IsClick = isClick;
-            _flicEventData.IsHold = isHold;
+            TaggedLog.Debug(LogTag, $"ButtonDidUpdateNickname: {nickname}.");
 
             _flicEvent.Invoke(_flicEventData);
         }
