@@ -20,13 +20,13 @@ namespace IDS.Portable.Flic.Button.Platforms.iOS
         public override void ButtonDidConnect(FLICButton button)
         {
             // Connected but not necessarily ready yet.
-            TaggedLog.Debug(LogTag, $"Button connected.");
+            TaggedLog.Debug(LogTag, $"Flic button connected but not yet ready.");
         }
 
         public override void ButtonIsReady(FLICButton button)
         {
             // Connected and ready to go.
-            TaggedLog.Debug(LogTag, $"Button connected and ready.");
+            TaggedLog.Debug(LogTag, $"Flic button connected and ready.");
 
             _flicEventData.Connected = true;
 

@@ -10,19 +10,20 @@ namespace IDS.Portable.Flic.Button.Platforms.iOS
 {
     internal class NativeFlicButtonManager : IFlicButtonManager
     {
-        // TODO: Change this back.
-        //private const string LogTag = "NativeFlicButtonManager";
-        private const string LogTag = "FlicDebug";
+        private const string LogTag = "NativeFlicButtonManager";
+        private const int ConfigureFlicManagerTimeoutMs = 2000;
+        private const int UnpairFlicButtonTimeoutMs = 2000;
+
         private static bool _managerReady = false;
 
         public NativeFlicButtonPlatform Platform => NativeFlicButtonPlatform.Ios;
 
-        private async Task<bool> Init()
+        public async Task Init()
         {
             if (_managerReady)
-                return true;
+                return;
 
-            var cts = new CancellationTokenSource(2000);
+            var cts = new CancellationTokenSource(ConfigureFlicManagerTimeoutMs);
             var cancellationToken = cts.Token;
 
             var tcs = new TaskCompletionSource<bool>();
@@ -32,53 +33,30 @@ namespace IDS.Portable.Flic.Button.Platforms.iOS
             {
                 TaggedLog.Debug(LogTag, $"FlicManager is ready.");
                 _managerReady = managerReady;
-                tcs.SetResult(managerReady);
+                tcs.TrySetResult(managerReady);
             }), new FlicButtonCallback((data) =>
             {
                 TaggedLog.Debug(LogTag, $"Received button data.");
 
             }), true);
 
-            return await tcs.TryWaitAsync(cancellationToken);
+            var success =  await tcs.TryWaitAsync(cancellationToken);
+            if (!success)
+                throw new FlicButtonManagerNotReadyException();
         }
 
+        // The iOS library has different behavior for scanning/pairing than the Android library. If a button has already been paired
+        // with the flic manager, then the iOS scan will eventually just time out with an error and never find the button. Because
+        // of that, it is important to make sure to unpair a button from the manager before removing it from the device source.
         public async Task<FlicButtonDeviceData?> ScanAndPairButton(CancellationToken cancellationToken)
         {
-            var managerReady = await Init();
-            if (!managerReady)
+            if (!_managerReady)
                 throw new FlicButtonManagerNotReadyException();
 
             var manager = FLICManager.SharedManager();
 
             if (manager is null)
                 throw new FlicButtonManagerNullException();
-
-            // TODO: Decide how we really want to handle this.
-            if (manager.Buttons.Length is 1)
-            {
-                TaggedLog.Debug("FlicDebug", $"Found already paired button.");
-
-                var button = manager.Buttons[0];
-
-                try
-                {
-                    SubscribeToButtonEvents(button.SerialNumber, (flicEvent) =>
-                    {
-                        TaggedLog.Debug("FlicDebug", $"Received button event.");
-                    });
-
-                    ConnectButton(button.SerialNumber);
-                    await TaskExtension.TryDelay(5000, cancellationToken);
-                    TaggedLog.Debug(LogTag, $"After delay State: {button.State} isReady: {button.IsReady} Delegate: {button.Delegate}.");
-
-                }
-                catch (Exception e)
-                {
-                    TaggedLog.Debug("FlicDebug", $"Exception subscribing/connecting button: {e}.");
-                }
-
-                return new FlicButtonDeviceData(button.Name ?? "", button.SerialNumber, button.BluetoothAddress, Convert.ToInt32(button.FirmwareRevision), button.Uuid);
-            }
 
             var tcs = new TaskCompletionSource<FlicButtonDeviceData?>();
 
@@ -105,10 +83,9 @@ namespace IDS.Portable.Flic.Button.Platforms.iOS
                 }
             }, (button, error)=> 
             {
-                // TODO: Verify this.
                 if (error is null)
                 {
-                    TaggedLog.Error(LogTag, $"Paired with flic button, SerialNumber: {button.SerialNumber} Mac: {button.BluetoothAddress}.");
+                    TaggedLog.Error(LogTag, $"Paired with flic button, SerialNumber: {button.SerialNumber} Mac: {button.BluetoothAddress} Uuid: {button.Uuid}.");
                     // We're complete and we don't have an error, our button is good to go.
                     tcs.TrySetResult(new FlicButtonDeviceData(button.Name ?? "", button.SerialNumber, button.BluetoothAddress, Convert.ToInt32(button.FirmwareRevision), button.Uuid));
                 }
@@ -124,7 +101,6 @@ namespace IDS.Portable.Flic.Button.Platforms.iOS
 
         public void SubscribeToButtonEvents(string serialNumber, Action<FlicButtonEventData> flicEvent)
         {
-            TaggedLog.Debug(LogTag, $"SubscribeToButtonEvents _managerReady: {_managerReady}.");
             if (!_managerReady)
                 throw new FlicButtonManagerNotReadyException();
 
@@ -138,13 +114,11 @@ namespace IDS.Portable.Flic.Button.Platforms.iOS
             if (button is null)
                 throw new FlicButtonNullException($"No flic button found with the serial number: {serialNumber}");
 
-            TaggedLog.Debug(LogTag, $"State: {button.State} isReady: {button.IsReady} Delegate: {button.Delegate}.");
             button.Delegate = new FlicButtonCallback(flicEvent);
         }
 
         public void ConnectButton(string serialNumber)
         {
-            TaggedLog.Debug(LogTag, $"ConnectButton _managerReady: {_managerReady}.");
             if (!_managerReady)
                 throw new FlicButtonManagerNotReadyException();
 
@@ -159,12 +133,10 @@ namespace IDS.Portable.Flic.Button.Platforms.iOS
                 throw new FlicButtonNullException($"No flic button found with the serial number: {serialNumber}");
 
             button.Connect();
-            TaggedLog.Debug(LogTag, $"State: {button.State} isReady: {button.IsReady} Delegate: {button.Delegate}.");
         }
 
         public void DisconnectOrAbortPendingConnection(string serialNumber)
         {
-            TaggedLog.Debug(LogTag, $"_managerReady: {_managerReady}.");
             if (!_managerReady)
                 throw new FlicButtonManagerNotReadyException();
 
@@ -179,6 +151,39 @@ namespace IDS.Portable.Flic.Button.Platforms.iOS
                 throw new FlicButtonNullException($"No flic button found with the serial number: {serialNumber}");
 
             button.Disconnect();
+        }
+
+        public async Task<bool> UnpairButton(string serialNumber)
+        {
+            if (!_managerReady)
+                throw new FlicButtonManagerNotReadyException();
+
+            var manager = FLICManager.SharedManager();
+
+            if (manager is null)
+                throw new FlicButtonManagerNullException();
+
+            var buttons = manager.Buttons;
+            var button = buttons.FirstOrDefault(button => button.SerialNumber == serialNumber);
+            if (button is null)
+                throw new FlicButtonNullException($"No flic button found with the serial number: {serialNumber}");
+
+            var cts = new CancellationTokenSource(UnpairFlicButtonTimeoutMs);
+            var cancellationToken = cts.Token;
+
+            var tcs = new TaskCompletionSource<bool>();
+
+            manager.ForgetButton(button, (_, error) =>
+            {
+                TaggedLog.Debug(LogTag, $"Error: {error}");
+                if (error is null)
+                {
+                    TaggedLog.Debug(LogTag, $"No error ");
+                    tcs.TrySetResult(true);
+                }
+            });
+
+            return await tcs.TryWaitAsync(cancellationToken);
         }
     }
 }

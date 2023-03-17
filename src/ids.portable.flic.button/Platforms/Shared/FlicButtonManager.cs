@@ -1,4 +1,6 @@
 ﻿using IDS.Portable.Common;
+using IDS.Portable.Common.Utils;
+using IDS.Portable.LogicalDevice;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -16,13 +18,39 @@ namespace IDS.Portable.Flic.Button.Platforms.Shared
     public class FlicButtonManager : Singleton<FlicButtonManager>, IFlicButtonManager
     {
         private readonly IFlicButtonManager _nativeFlicButtonManager;
+        private const string LogTag = "FlicButtonManager";
+        private const int MaxFlicLibraryInitTimeMs = 1000;
 
         private FlicButtonManager()
         {
             _nativeFlicButtonManager = ServiceCollection.Resolve<IFlicButtonManager>();
+
+            // TODO: Figure out how we want to handle this.
+            TryInit();
         }
 
         public NativeFlicButtonPlatform Platform => _nativeFlicButtonManager.Platform;
+
+        private void TryInit()
+        {
+            TaggedLog.Debug(LogTag, $"Calling TryInit.");
+            try
+            {
+                using (new PerformanceTimer(LogTag, $"Flic library init", TimeSpan.FromMilliseconds(MaxFlicLibraryInitTimeMs), PerformanceTimerOption.AutoStartOnCreate | PerformanceTimerOption.OnShowStopTotalTimeInMs))
+                {
+                    Init().Wait();
+                }
+            }
+            catch (Exception e)
+            {
+                TaggedLog.Debug(LogTag, $"Error Initializing Flic library: {e}");
+            }
+        }
+
+        /// <summary>
+        /// Initializes the native flic library and throws if unsuccessful.
+        /// </summary>
+        public async Task Init() => await _nativeFlicButtonManager.Init();
 
         /// <summary>
         /// Scans for and pairs a flic button that is in pairing mode. The timeout on the scan is 30 seconds.
@@ -54,5 +82,14 @@ namespace IDS.Portable.Flic.Button.Platforms.Shared
         /// <param name="serialNumber">The serial number of the device to disconnect from.</param>
         public void DisconnectOrAbortPendingConnection(string serialNumber) =>
             _nativeFlicButtonManager.DisconnectOrAbortPendingConnection(serialNumber);
+
+        /// <summary>
+        /// Completely removes a button from the flic manager. It is important to call this before we finish removing the device
+        /// from the device layer.
+        /// </summary>
+        /// <param name="serialNumber">The serial number of the device to unpair from.</param>
+        /// <returns>True if removing the button was successful.</returns>
+        public async Task<bool> UnpairButton(string serialNumber) =>
+            await _nativeFlicButtonManager.UnpairButton(serialNumber);
     }
 }
