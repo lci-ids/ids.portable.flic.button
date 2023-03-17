@@ -128,34 +128,42 @@ namespace FlicLibraryIos
         void ButtonDidFailToConnectWithError(FLICButton button, [NullAllowed] NSError error);
 
         // @optional -(void)button:(FLICButton * _Nonnull)button didReceiveButtonDown:(BOOL)queued age:(NSInteger)age;
+        [Abstract]
         [Export("button:didReceiveButtonDown:age:")]
         void ButtonDidReceiveButtonDown(FLICButton button, bool queued, nint age);
 
         // @optional -(void)button:(FLICButton * _Nonnull)button didReceiveButtonUp:(BOOL)queued age:(NSInteger)age;
+        [Abstract]
         [Export("button:didReceiveButtonUp:age:")]
         void ButtonDidReceiveButtonUp(FLICButton button, bool queued, nint age);
 
         // @optional -(void)button:(FLICButton * _Nonnull)button didReceiveButtonClick:(BOOL)queued age:(NSInteger)age;
+        [Abstract]
         [Export("button:didReceiveButtonClick:age:")]
         void ButtonDidReceiveButtonClick(FLICButton button, bool queued, nint age);
 
         // @optional -(void)button:(FLICButton * _Nonnull)button didReceiveButtonDoubleClick:(BOOL)queued age:(NSInteger)age;
+        [Abstract]
         [Export("button:didReceiveButtonDoubleClick:age:")]
         void ButtonDidReceiveButtonDoubleClick(FLICButton button, bool queued, nint age);
 
         // @optional -(void)button:(FLICButton * _Nonnull)button didReceiveButtonHold:(BOOL)queued age:(NSInteger)age;
+        [Abstract]
         [Export("button:didReceiveButtonHold:age:")]
         void ButtonDidReceiveButtonHold(FLICButton button, bool queued, nint age);
 
         // @optional -(void)button:(FLICButton * _Nonnull)button didUnpairWithError:(NSError * _Nullable)error;
+        [Abstract]
         [Export("button:didUnpairWithError:")]
         void ButtonDidUnpairWithError(FLICButton button, [NullAllowed] NSError error);
 
         // @optional -(void)button:(FLICButton * _Nonnull)button didUpdateBatteryVoltage:(float)voltage;
+        [Abstract]
         [Export("button:didUpdateBatteryVoltage:")]
         void ButtonDidUpdateBatteryVoltage(FLICButton button, float voltage);
 
         // @optional -(void)button:(FLICButton * _Nonnull)button didUpdateNickname:(NSString * _Nonnull)nickname;
+        [Abstract]
         [Export("button:didUpdateNickname:")]
         void ButtonDidUpdateNickname(FLICButton button, string nickname);
     }
