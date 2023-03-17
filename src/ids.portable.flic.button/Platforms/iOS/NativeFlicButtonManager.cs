@@ -11,7 +11,8 @@ namespace IDS.Portable.Flic.Button.Platforms.iOS
     internal class NativeFlicButtonManager : IFlicButtonManager
     {
         private const string LogTag = "NativeFlicButtonManager";
-        private const int ConfigureFlicManagerTimeoutMs = 2000;
+        private const int ConfigureFlicManagerTimeoutMs = 10000;
+        private const int FlicManagerInitDelayMs = 600;
         private const int UnpairFlicButtonTimeoutMs = 2000;
 
         private static bool _managerReady = false;
@@ -22,6 +23,8 @@ namespace IDS.Portable.Flic.Button.Platforms.iOS
         {
             if (_managerReady)
                 return;
+
+            await TaskExtension.TryDelay(FlicManagerInitDelayMs, CancellationToken.None);
 
             var cts = new CancellationTokenSource(ConfigureFlicManagerTimeoutMs);
             var cancellationToken = cts.Token;
@@ -40,7 +43,7 @@ namespace IDS.Portable.Flic.Button.Platforms.iOS
 
             }), true);
 
-            var success =  await tcs.TryWaitAsync(cancellationToken);
+            var success =  await tcs.TryWaitAsync(cancellationToken).ConfigureAwait(false);
             if (!success)
                 throw new FlicButtonManagerNotReadyException();
         }

@@ -24,33 +24,25 @@ namespace IDS.Portable.Flic.Button.Platforms.Shared
         private FlicButtonManager()
         {
             _nativeFlicButtonManager = ServiceCollection.Resolve<IFlicButtonManager>();
-
-            // TODO: Figure out how we want to handle this.
-            TryInit();
         }
 
         public NativeFlicButtonPlatform Platform => _nativeFlicButtonManager.Platform;
 
-        private void TryInit()
-        {
-            TaggedLog.Debug(LogTag, $"Calling TryInit.");
-            try
-            {
-                using (new PerformanceTimer(LogTag, $"Flic library init", TimeSpan.FromMilliseconds(MaxFlicLibraryInitTimeMs), PerformanceTimerOption.AutoStartOnCreate | PerformanceTimerOption.OnShowStopTotalTimeInMs))
-                {
-                    Init().Wait();
-                }
-            }
-            catch (Exception e)
-            {
-                TaggedLog.Debug(LogTag, $"Error Initializing Flic library: {e}");
-            }
-        }
-
         /// <summary>
         /// Initializes the native flic library and throws if unsuccessful.
         /// </summary>
-        public async Task Init() => await _nativeFlicButtonManager.Init();
+        public async Task Init()
+        {
+            try
+            {
+                await _nativeFlicButtonManager.Init();
+            }
+            catch (Exception e)
+            {
+                TaggedLog.Debug(LogTag, $"Unable to initialize Flic Library: {e}");
+            }
+        }
+
 
         /// <summary>
         /// Scans for and pairs a flic button that is in pairing mode. The timeout on the scan is 30 seconds.
