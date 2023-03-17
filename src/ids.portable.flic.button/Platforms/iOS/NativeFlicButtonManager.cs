@@ -24,6 +24,8 @@ namespace IDS.Portable.Flic.Button.Platforms.iOS
             if (_managerReady)
                 return;
 
+            // The ConfigureWithDelegate call below will not function without this delay. We tried a handful of different approaches
+            // to avoid this, but ultimately this is the only thing that would work.
             await TaskExtension.TryDelay(FlicManagerInitDelayMs, CancellationToken.None);
 
             var cts = new CancellationTokenSource(ConfigureFlicManagerTimeoutMs);
