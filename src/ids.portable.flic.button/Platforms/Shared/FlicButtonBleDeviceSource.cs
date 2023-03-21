@@ -108,11 +108,18 @@ public class FlicButtonBleDeviceSource : CommonDisposable, IFlicButtonBleDeviceS
     /// </returns>
     public async Task<SensorConnectionFlic?> ScanAndPairFlicButton(CancellationToken cancellationToken)
     {
-        var data = await FlicButtonManager.Instance.ScanAndPairButton(cancellationToken);
-        if (data is not null)
+        try
         {
-            TaggedLog.Debug(LogTag, $"Paired Flic Button. SerialNumber: {data.Value.SerialNumber} Firmware: {data.Value.FirmwareVersion} MAC: {data.Value.MacAddress} UUID: {data.Value.Uuid}");
-            return new SensorConnectionFlic(data.Value.Name, Guid.Parse(data.Value.Uuid), data.Value.MacAddress.ToMAC(), data.Value.SerialNumber);
+            var data = await FlicButtonManager.Instance.ScanAndPairButton(cancellationToken);
+            if (data is not null)
+            {
+                TaggedLog.Debug(LogTag,$"Paired Flic Button. SerialNumber: {data.Value.SerialNumber} Firmware: {data.Value.FirmwareVersion} MAC: {data.Value.MacAddress} UUID: {data.Value.Uuid}");
+                return new SensorConnectionFlic(data.Value.Name, Guid.Parse(data.Value.Uuid), data.Value.MacAddress.ToMAC(), data.Value.SerialNumber);
+            }
+        }
+        catch (Exception e)
+        {
+            TaggedLog.Debug(LogTag, $"Exception scanning and pairing flic button: {e}");
         }
 
         return null;

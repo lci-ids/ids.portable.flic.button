@@ -39,7 +39,7 @@
     <None Remove="Platforms\Shared\FlicScanPairCallback.cs" />
     <None Remove="Platforms\Shared\IFlicButtonManager.cs" />
 
-    <PackageReference Include="IDS.Plugin.BLE" Version="3.1.*" />
+    <PackageReference Include="IDS.Plugin.BLE" Version="3.2.*" />
     <PackageReference Include="ids.portable.common" Version="3.*" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" /> <!-- use 2.2.0-pre2 for UWP -->
@@ -62,8 +62,8 @@
   <ItemGroup Condition=" $(TargetFramework.StartsWith('monoandroid')) ">
     <Compile Include="Platforms\Shared\**\*.cs" />
     <Compile Include="Platforms\Android\**\*.cs" />
-    <PackageReference Include="Xamarin.AndroidX.Work.Runtime" Version="2.7.1.1" />
-    <PackageReference Include="Xamarin.AndroidX.Concurrent.Futures" Version="1.1.0.1" />
+    <PackageReference Include="Xamarin.AndroidX.Work.Runtime" Version="2.7.1.3" />
+    <PackageReference Include="Xamarin.AndroidX.Concurrent.Futures" Version="1.1.0.11" />
     
     <ProjectReference Include="..\ids.portable.flic.button.Android\ids.portable.flic.button.Android.csproj">
       <PrivateAssets>all</PrivateAssets>
@@ -73,6 +73,11 @@
   <ItemGroup Condition=" $(TargetFramework.StartsWith('xamarin.ios')) ">
     <Compile Include="Platforms\Shared\**\*.cs" />
     <Compile Include="Platforms\iOS\**\*.cs" />
+
+    <Reference Include="FlicLibraryIos">
+      <HintPath>..\ids.portable.flic.button.ios.library\FlicLibraryIos.dll</HintPath>
+    </Reference>
+
   </ItemGroup>
 
   <ItemGroup>

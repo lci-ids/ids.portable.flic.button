@@ -52,9 +52,11 @@ namespace IDS.Portable.Flic.Button.Platforms.Shared
     {
         NativeFlicButtonPlatform Platform { get; }
 
+        Task Init();
         Task<FlicButtonDeviceData?> ScanAndPairButton(CancellationToken cancellationToken);
         void SubscribeToButtonEvents(string serialNumber, Action<FlicButtonEventData> flicEvent);
         void ConnectButton(string serialNumber);
         void DisconnectOrAbortPendingConnection(string serialNumber);
+        Task<bool> UnpairButton(string serialNumber);
     }
 }
