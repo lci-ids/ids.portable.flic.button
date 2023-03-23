@@ -1,0 +1,100 @@
+# Nuget build pipeline
+# 
+# https://aka.ms/yaml
+
+trigger:
+- release*
+- main
+
+pool: 'Local Windows'
+  
+
+stages:
+
+ - stage: Build
+   jobs:
+    - job: LibBuild
+      steps:
+      - template: build_tools_setup.yml
+
+      - task: gitversion/setup@0
+        inputs:
+          versionSpec: '5.x'
+            
+      - task: gitversion/execute@0
+
+      - task: NuGetCommand@2
+        displayName: 'NuGet restore'
+        inputs:
+          command: 'restore'
+          restoreSolution: '$(build-solution)'
+          feedsToUse: 'select'
+          vstsFeed: 'f703c69c-2dfa-4eb0-bf6f-c5a65ea32777'
+
+      - task: MSBuild@1
+        displayName: 'NuGet build and pack - Production'
+        inputs:
+          solution: '$(build-project)'
+          msbuildArchitecture: 'x64'
+          configuration: '$(BuildConfiguration)'
+          msbuildArguments: '/t:build;pack /p:PackageVersion=$(buildversion) /p:AssemblyFileVersion=$(buildversion)'
+        condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+
+      - task: MSBuild@1
+        displayName: 'NuGet build and pack - Pre-production'
+        inputs:
+          solution: '$(build-project)'
+          msbuildArchitecture: 'x64'
+          configuration: '$(BuildConfiguration)'
+          msbuildArguments: '/t:build;pack /p:PackageVersion=$(buildversion)-pre /p:PackageOutputPath=$(build.artifactstagingdirectory)/public /p:AssemblyFileVersion=$(buildversion)'
+        condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/heads/release'))
+
+      - task: MSBuild@1
+        displayName: 'NuGet build Pull Request'
+        inputs:
+          solution: '$(build-project)'
+          msbuildArchitecture: 'x64'
+          configuration: '$(BuildConfiguration)'
+          msbuildArguments: '/t:build;pack /p:PackageVersion=$(buildversion)-beta /p:PackageOutputPath=$(build.artifactstagingdirectory)/public /p:AssemblyFileVersion=$(buildversion)'
+        condition: and(succeeded(), eq(variables['Build.Reason'], 'PullRequest'))
+
+      - task: VSTest@2
+        inputs:
+          testSelector: 'testAssemblies'
+          testAssemblyVer2: |
+            **\*test*.dll
+            !**\*TestAdapter.dll
+            !**\obj\**
+          searchFolder: '$(System.DefaultWorkingDirectory)'
+          codeCoverageEnabled: True
+
+      - task: CopyFiles@2
+        displayName: 'Copy Files to: $(build.artifactstagingdirectory) '
+        inputs:
+          SourceFolder: '$(build.sourcesdirectory)'
+          Contents: '**\bin\$(BuildConfiguration)\**\*.nupkg'
+          TargetFolder: '$(build.artifactstagingdirectory)'
+
+      - task: PublishBuildArtifacts@1
+        inputs:
+          PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+          ArtifactName: 'drop'
+          publishLocation: 'Container'
+
+ - stage: Publish
+   condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
+   jobs:
+    - deployment: FeedDeployment
+      environment: Production
+      strategy:
+        runOnce:    #rolling, canary are the other strategies that are supported
+          deploy:
+            steps:
+            - task: DotNetCoreCLI@2
+              inputs:
+                command: 'push'
+                packagesToPush: '$(Agent.BuildDirectory)/**/*.nupkg;!$(Agent.BuildDirectory)/**/*.symbols.nupkg'
+                nuGetFeedType: 'internal'
+                publishVstsFeed: 'f703c69c-2dfa-4eb0-bf6f-c5a65ea32777'
+       
+
