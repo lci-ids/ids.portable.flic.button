@@ -6,8 +6,8 @@ trigger:
 - release*
 - main
 
-pool: 'Local Windows'
-  
+pool:
+  vmImage: 'windows-latest'
 
 stages:
 
