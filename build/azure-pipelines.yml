@@ -3,7 +3,6 @@
 # https://aka.ms/yaml
 
 trigger:
-- release*
 - main
 
 pool:
@@ -37,17 +36,8 @@ stages:
           solution: '$(build-project)'
           msbuildArchitecture: 'x64'
           configuration: '$(BuildConfiguration)'
-          msbuildArguments: '/t:build;pack /p:PackageVersion=$(buildversion) /p:AssemblyFileVersion=$(buildversion)'
+          msbuildArguments: '/t:build;pack /p:RestorePackagesConfig=false /p:PackageVersion=$(buildversion) /p:AssemblyFileVersion=$(buildversion)'
         condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
-
-      - task: MSBuild@1
-        displayName: 'NuGet build and pack - Pre-production'
-        inputs:
-          solution: '$(build-project)'
-          msbuildArchitecture: 'x64'
-          configuration: '$(BuildConfiguration)'
-          msbuildArguments: '/t:build;pack /p:PackageVersion=$(buildversion)-pre /p:PackageOutputPath=$(build.artifactstagingdirectory)/public /p:AssemblyFileVersion=$(buildversion)'
-        condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/heads/release'))
 
       - task: MSBuild@1
         displayName: 'NuGet build Pull Request'
