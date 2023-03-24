@@ -6,7 +6,7 @@ trigger:
 - main
 
 pool:
-  vmImage: 'windows-latest'
+  vmImage: 'macos-latest'
 
 stages:
 
@@ -42,7 +42,7 @@ stages:
       - task: MSBuild@1
         displayName: 'NuGet build Pull Request'
         inputs:
-          solution: '$(build-project)'
+          solution: '$(build-solution)'
           msbuildArchitecture: 'x64'
           configuration: '$(BuildConfiguration)'
           msbuildArguments: '/t:build;pack /p:PackageVersion=$(buildversion)-beta /p:PackageOutputPath=$(build.artifactstagingdirectory)/public /p:AssemblyFileVersion=$(buildversion)'
