@@ -47,9 +47,9 @@
     <PackageReference Include="System.Threading.Tasks.Dataflow" Version="4.11.0" />
     <PackageReference Include="Xamarin.Essentials" Version="1.7.3" />
 
-    <ProjectReference Include="..\..\..\onecontrol.direct.idscomm\OneControl.Direct.IdsCanAccessoryBle\OneControl.Direct.IdsCanAccessoryBle.csproj" />
-    <ProjectReference Include="..\..\..\onecontrol.devices\OneControl.Devices.csproj" />
-    <ProjectReference Include="..\..\..\ids.portable.logicaldevices\IDS.Portable.LogicalDevices.csproj" />
+    <PackageReference Include="IDS.Portable.LogicalDevices" Version="3.9.1.48153" />
+    <PackageReference Include="OneControl.Devices" Version="3.7.1.48537" />
+    <PackageReference Include="OneControl.Direct.IdsCanAccessoryBle" Version="1.1.1.40372" />
   </ItemGroup>
   
   <ItemGroup Condition=" $(TargetFramework.StartsWith('netstandard')) ">
