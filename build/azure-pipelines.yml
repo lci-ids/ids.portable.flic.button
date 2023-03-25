@@ -5,8 +5,8 @@
 trigger:
 - main
 
-pool:
-  vmImage: 'macos-latest'
+pool: "Local MacOS"
+  #vmImage: 'macos-latest'
 
 stages:
 
