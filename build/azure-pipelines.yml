@@ -41,7 +41,7 @@ stages:
       - task: Bash@3
         displayName: "Build Library"
         inputs:
-          filePath: "build/templates/mono-build.sh"
+          filePath: "build/mono-build.sh"
           arguments: '"$(build-solution)" "$(BuildConfiguration)" "build;pack" "/p:PackageVersion=$(buildversion) /p:AssemblyFileVersion=$(buildversion)"'
         condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
 
