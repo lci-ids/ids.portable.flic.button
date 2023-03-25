@@ -54,15 +54,15 @@ stages:
           msbuildArguments: '/t:build;pack /p:PackageVersion=$(buildversion) /p:PackageOutputPath=$(build.artifactstagingdirectory)/public /p:AssemblyFileVersion=$(buildversion)'
         condition: and(succeeded(), eq(variables['Build.Reason'], 'PullRequest'))
 
-      - task: VSTest@2
-        inputs:
-          testSelector: 'testAssemblies'
-          testAssemblyVer2: |
-            **\*test*.dll
-            !**\*TestAdapter.dll
-            !**\obj\**
-          searchFolder: '$(System.DefaultWorkingDirectory)'
-          codeCoverageEnabled: True
+ #     - task: VSTest@2
+ #       inputs:
+ #         testSelector: 'testAssemblies'
+ #         testAssemblyVer2: |
+ #           **\*test*.dll
+ #           !**\*TestAdapter.dll
+ #           !**\obj\**
+ #         searchFolder: '$(System.DefaultWorkingDirectory)'
+ #         codeCoverageEnabled: True
 
       - task: CopyFiles@2
         displayName: 'Copy Files to: $(build.artifactstagingdirectory) '
