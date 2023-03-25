@@ -30,13 +30,19 @@ stages:
           feedsToUse: 'select'
           vstsFeed: 'f703c69c-2dfa-4eb0-bf6f-c5a65ea32777'
 
-      - task: MSBuild@1
-        displayName: 'NuGet build and pack - Production'
+#      - task: MSBuild@1
+#        displayName: 'NuGet build and pack - Production'
+#        inputs:
+#          solution: '$(build-solution)'
+#          msbuildArchitecture: 'x64'
+#          configuration: '$(BuildConfiguration)'
+#          msbuildArguments: '/t:build;pack /p:PackageVersion=$(buildversion) /p:AssemblyFileVersion=$(buildversion)'
+#        condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
+      - task: Bash@3
+        displayName: "Build Library"
         inputs:
-          solution: '$(build-solution)'
-          msbuildArchitecture: 'x64'
-          configuration: '$(BuildConfiguration)'
-          msbuildArguments: '/t:build;pack /p:PackageVersion=$(buildversion) /p:AssemblyFileVersion=$(buildversion)'
+          filePath: "build/templates/mono-build.sh"
+          arguments: '"${{ parameters.solution }}" "${{ parameters.buildConfiguration }}" "build;pack" "/p:PackageVersion=$(buildversion) /p:AssemblyFileVersion=$(buildversion)"'
         condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
 
       - task: MSBuild@1
@@ -45,7 +51,7 @@ stages:
           solution: '$(build-solution)'
           msbuildArchitecture: 'x64'
           configuration: '$(BuildConfiguration)'
-          msbuildArguments: '/t:build;pack /p:PackageVersion=$(buildversion)-beta /p:PackageOutputPath=$(build.artifactstagingdirectory)/public /p:AssemblyFileVersion=$(buildversion)'
+          msbuildArguments: '/t:build;pack /p:PackageVersion=$(buildversion) /p:PackageOutputPath=$(build.artifactstagingdirectory)/public /p:AssemblyFileVersion=$(buildversion)'
         condition: and(succeeded(), eq(variables['Build.Reason'], 'PullRequest'))
 
       - task: VSTest@2
