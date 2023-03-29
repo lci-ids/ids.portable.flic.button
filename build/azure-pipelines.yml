@@ -5,6 +5,9 @@
 trigger:
 - main
 
+variables:
+  buildversion: $(GITVERSION.MAJOR).$(GITVERSION.MINOR).$(GITVERSION.PATCH).$(Build.BuildId)
+
 pool: "Local MacOS"
   #vmImage: 'macos-latest'
 
@@ -22,22 +25,6 @@ stages:
             
       - task: gitversion/execute@0
 
-      - task: NuGetCommand@2
-        displayName: 'NuGet restore'
-        inputs:
-          command: 'restore'
-          restoreSolution: '$(build-solution)'
-          feedsToUse: 'select'
-          vstsFeed: 'f703c69c-2dfa-4eb0-bf6f-c5a65ea32777'
-
-#      - task: MSBuild@1
-#        displayName: 'NuGet build and pack - Production'
-#        inputs:
-#          solution: '$(build-solution)'
-#          msbuildArchitecture: 'x64'
-#          configuration: '$(BuildConfiguration)'
-#          msbuildArguments: '/t:build;pack /p:PackageVersion=$(buildversion) /p:AssemblyFileVersion=$(buildversion)'
-#        condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
       - task: Bash@3
         displayName: "Build Library"
         inputs:
@@ -45,14 +32,7 @@ stages:
           arguments: '"$(build-solution)" "$(BuildConfiguration)" "build;pack" "/p:RestorePackagesPath=./Nuget.config /p:RestorePackagesConfig=false /p:PackageVersion=$(buildversion) /p:AssemblyFileVersion=$(buildversion)"'
         condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
 
-      - task: MSBuild@1
-        displayName: 'NuGet build Pull Request'
-        inputs:
-          solution: '$(build-solution)'
-          msbuildArchitecture: 'x64'
-          configuration: '$(BuildConfiguration)'
-          msbuildArguments: '/t:build;pack /p:PackageVersion=$(buildversion) /p:PackageOutputPath=$(build.artifactstagingdirectory)/public /p:AssemblyFileVersion=$(buildversion)'
-        condition: and(succeeded(), eq(variables['Build.Reason'], 'PullRequest'))
+
 
  #     - task: VSTest@2
  #       inputs:
@@ -63,6 +43,17 @@ stages:
  #           !**\obj\**
  #         searchFolder: '$(System.DefaultWorkingDirectory)'
  #         codeCoverageEnabled: True
+      - task: DotNetCoreCLI@2
+        displayName: 'dotnet pack - Production'
+        inputs:
+          command: pack
+          projects: '$(build-solution)'
+          versioningScheme: 'byEnvVar'
+          versionEnvVar: 'buildversion'
+          feedsToUse: 'select'
+          vstsFeed: 'IDSLibraries' 
+          arguments: '--configuration Release --output $(Build.ArtifactStagingDirectory)/nupkgs'
+        condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
 
       - task: CopyFiles@2
         displayName: 'Copy Files to: $(build.artifactstagingdirectory) '
