@@ -35,21 +35,21 @@ stages:
           vstsFeed: 'IDSLibraries' 
         condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
 
-#      - task: Bash@3
-#        displayName: "Build Library"
-#        inputs:
-#          filePath: "build/mono-build.sh"
-#          arguments: '"$(build-solution)" "$(BuildConfiguration)" "build" "/p:RestorePackagesPath=./Nuget.config /p:PackageVersion=$(buildversion) /p:AssemblyFileVersion=$(buildversion)"'
-#        condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
-
-      - task: MSBuild@1
-        displayName: 'NuGet build and pack - Production'
+      - task: Bash@3
+        displayName: "Build Library"
         inputs:
-          solution: '$(build-project)'
-          msbuildArchitecture: 'x64'
-          configuration: '$(BuildConfiguration)'
-          msbuildArguments: '/t:build;pack /p:PackageVersion=$(buildversion) /p:PackageOutputPath=$(build.artifactstagingdirectory)/public /p:AssemblyFileVersion=$(buildversion)'
+          filePath: "build/mono-build.sh"
+          arguments: '"$(build-solution)" "$(BuildConfiguration)" "build;pack" "/p:RestorePackagesPath=./Nuget.config /p:PackageVersion=$(buildversion) /p:AssemblyFileVersion=$(buildversion)"'
         condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
+
+      # - task: MSBuild@1
+        # displayName: 'NuGet build and pack - Production'
+        # inputs:
+          # solution: '$(build-project)'
+          # msbuildArchitecture: 'x64'
+          # configuration: '$(BuildConfiguration)'
+          # msbuildArguments: '/t:build;pack /p:PackageVersion=$(buildversion) /p:PackageOutputPath=$(build.artifactstagingdirectory)/public /p:AssemblyFileVersion=$(buildversion)'
+        # condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
 
 
  #     - task: VSTest@2
