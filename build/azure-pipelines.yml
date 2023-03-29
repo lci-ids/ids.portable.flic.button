@@ -29,7 +29,7 @@ stages:
         displayName: "Build Library"
         inputs:
           filePath: "build/mono-build.sh"
-          arguments: '"$(build-solution)" "$(BuildConfiguration)" "build;pack" "/p:RestorePackagesPath=./Nuget.config /p:RestorePackagesConfig=false /p:PackageVersion=$(buildversion) /p:AssemblyFileVersion=$(buildversion)"'
+          arguments: '"$(build-solution)" "$(BuildConfiguration)" "build;pack" "/p:RestorePackagesPath=./Nuget.config /p:PackageVersion=$(buildversion) /p:AssemblyFileVersion=$(buildversion)"'
         condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
 
 
