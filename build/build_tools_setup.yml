@@ -10,16 +10,6 @@ steps:
     versionSpec: '$(nuget_version)'
 
 - task: UseDotNet@2
-  inputs:
-    packageType: 'runtime'
-    version: '2.1.0'
-
-- task: UseDotNet@2
-  inputs:
-    packageType: 'runtime'
-    version: '2.2.0'
-
-- task: UseDotNet@2
   displayName: 'Use .Net Core sdk $(dotnet_version)'
   inputs:
     version: '$(dotnet_version)'
