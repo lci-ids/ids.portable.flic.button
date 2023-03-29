@@ -35,13 +35,21 @@ stages:
           vstsFeed: 'IDSLibraries' 
         condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
 
-      - task: Bash@3
-        displayName: "Build Library"
-        inputs:
-          filePath: "build/mono-build.sh"
-          arguments: '"$(build-solution)" "$(BuildConfiguration)" "build" "/p:RestorePackagesPath=./Nuget.config /p:PackageVersion=$(buildversion) /p:AssemblyFileVersion=$(buildversion)"'
-        condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
+#      - task: Bash@3
+#        displayName: "Build Library"
+#        inputs:
+#          filePath: "build/mono-build.sh"
+#          arguments: '"$(build-solution)" "$(BuildConfiguration)" "build" "/p:RestorePackagesPath=./Nuget.config /p:PackageVersion=$(buildversion) /p:AssemblyFileVersion=$(buildversion)"'
+#        condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
 
+      - task: MSBuild@1
+        displayName: 'NuGet build and pack - Production'
+        inputs:
+          solution: '$(build-project)'
+          msbuildArchitecture: 'x64'
+          configuration: '$(BuildConfiguration)'
+          msbuildArguments: '/t:build;pack /p:PackageVersion=$(buildversion) /p:PackageOutputPath=$(build.artifactstagingdirectory)/public /p:AssemblyFileVersion=$(buildversion)'
+        condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
 
 
  #     - task: VSTest@2
@@ -53,17 +61,17 @@ stages:
  #           !**\obj\**
  #         searchFolder: '$(System.DefaultWorkingDirectory)'
  #         codeCoverageEnabled: True
-      - task: DotNetCoreCLI@2
-        displayName: 'dotnet pack - Production'
-        inputs:
-          command: pack
-          projects: '$(build-solution)'
-          versioningScheme: 'byEnvVar'
-          versionEnvVar: 'buildversion'
-          feedsToUse: 'select'
-          vstsFeed: 'IDSLibraries' 
-          arguments: '--configuration Release --output $(Build.ArtifactStagingDirectory)/nupkgs'
-        condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
+      # - task: DotNetCoreCLI@2
+      #   displayName: 'dotnet pack - Production'
+      #   inputs:
+      #     command: pack
+      #     projects: '$(build-solution)'
+      #     versioningScheme: 'byEnvVar'
+      #     versionEnvVar: 'buildversion'
+      #     feedsToUse: 'select'
+      #     vstsFeed: 'IDSLibraries' 
+      #     arguments: '--configuration Release --output $(Build.ArtifactStagingDirectory)/nupkgs'
+      #   condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
 
       - task: CopyFiles@2
         displayName: 'Copy Files to: $(build.artifactstagingdirectory) '
