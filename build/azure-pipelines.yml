@@ -27,6 +27,14 @@ stages:
 
       - task: NuGetAuthenticate@1
 
+      - task: DotNetCoreCLI@2
+        displayName: 'Restore Nugets'
+        inputs:
+          command: restore
+          feedsToUse: 'select'
+          vstsFeed: 'IDSLibraries' 
+        condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
+
       - task: Bash@3
         displayName: "Build Library"
         inputs:
@@ -55,7 +63,7 @@ stages:
           feedsToUse: 'select'
           vstsFeed: 'IDSLibraries' 
           arguments: '--configuration Release --output $(Build.ArtifactStagingDirectory)/nupkgs'
-        condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+        condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
 
       - task: CopyFiles@2
         displayName: 'Copy Files to: $(build.artifactstagingdirectory) '
