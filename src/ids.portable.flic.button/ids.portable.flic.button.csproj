@@ -48,8 +48,8 @@
     <PackageReference Include="Xamarin.Essentials" Version="1.7.3" />
 
     <PackageReference Include="IDS.Portable.LogicalDevices" Version="3.9.1.48153" />
-    <PackageReference Include="OneControl.Devices" Version="3.7.1.48537" />
-    <PackageReference Include="OneControl.Direct.IdsCanAccessoryBle" Version="1.1.1.40372" />
+    <PackageReference Include="OneControl.Devices" Version="3.7.1.49275" />
+    <PackageReference Include="OneControl.Direct.IdsCanAccessoryBle" Version="1.1.1.49292" />
   </ItemGroup>
   
   <ItemGroup Condition=" $(TargetFramework.StartsWith('netstandard')) ">
