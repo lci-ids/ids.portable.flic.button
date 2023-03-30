@@ -5,6 +5,8 @@ using IO.Flic.Flic2libandroid;
 using IDS.Portable.Common;
 using System.Threading.Tasks;
 using System.Threading;
+using IDS.Core.IDS_CAN;
+using IDS.Portable.LogicalDevice;
 
 namespace IDS.Portable.Flic.Button.Platforms.Android
 {
@@ -38,7 +40,7 @@ namespace IDS.Portable.Flic.Button.Platforms.Android
             return await tcs.TryWaitAsync(cancellationToken);
         }
 
-        public void SubscribeToButtonEvents(string serialNumber, Action<FlicButtonEventData> flicEvent)
+        public void SubscribeToButtonEvents(MAC mac, Action<FlicButtonEventData> flicEvent)
         {
             var manager = Flic2Manager.Instance;
 
@@ -46,14 +48,14 @@ namespace IDS.Portable.Flic.Button.Platforms.Android
                 throw new FlicButtonManagerNullException();
 
             var buttons = manager.Buttons;
-            var button = buttons.FirstOrDefault(button => button.SerialNumber == serialNumber);
+            var button = buttons.FirstOrDefault(button => button.BdAddr.ToMAC() == mac);
             if (button is null)
-                throw new FlicButtonNullException($"No flic button found with the serial number: {serialNumber}");
+                throw new FlicButtonNullException($"No flic button found with the mac: {mac}");
 
             button.AddListener(new FlicButtonListenerCallback(flicEvent));
         }
 
-        public void ConnectButton(string serialNumber)
+        public void ConnectButton(MAC mac)
         {
             var manager = Flic2Manager.Instance;
 
@@ -61,14 +63,14 @@ namespace IDS.Portable.Flic.Button.Platforms.Android
                 throw new FlicButtonManagerNullException();
 
             var buttons = manager.Buttons;
-            var button = buttons.FirstOrDefault(button => button.SerialNumber == serialNumber);
+            var button = buttons.FirstOrDefault(button => button.BdAddr.ToMAC() == mac);
             if (button is null)
-                throw new FlicButtonNullException($"No flic button found with the serial number: {serialNumber}");
+                throw new FlicButtonNullException($"No flic button found with the mac: {mac}");
 
             button.Connect();
         }
 
-        public void DisconnectOrAbortPendingConnection(string serialNumber)
+        public void DisconnectOrAbortPendingConnection(MAC mac)
         {
             var manager = Flic2Manager.Instance;
 
@@ -76,14 +78,14 @@ namespace IDS.Portable.Flic.Button.Platforms.Android
                 throw new FlicButtonManagerNullException();
 
             var buttons = manager.Buttons;
-            var button = buttons.FirstOrDefault(button => button.SerialNumber == serialNumber);
+            var button = buttons.FirstOrDefault(button => button.BdAddr.ToMAC() == mac);
             if (button is null)
-                throw new FlicButtonNullException($"No flic button found with the serial number: {serialNumber}");
+                throw new FlicButtonNullException($"No flic button found with the mac: {mac}");
 
             button.DisconnectOrAbortPendingConnection();
         }
 
-        public Task<bool> UnpairButton(string serialNumber)
+        public Task<bool> UnpairButton(MAC mac)
         {
             var manager = Flic2Manager.Instance;
 
@@ -91,9 +93,9 @@ namespace IDS.Portable.Flic.Button.Platforms.Android
                 throw new FlicButtonManagerNullException();
 
             var buttons = manager.Buttons;
-            var button = buttons.FirstOrDefault(button => button.SerialNumber == serialNumber);
+            var button = buttons.FirstOrDefault(button => button.BdAddr.ToMAC() == mac);
             if (button is null)
-                throw new FlicButtonNullException($"No flic button found with the serial number: {serialNumber}");
+                throw new FlicButtonNullException($"No flic button found with the mac: {mac}");
 
             manager.ForgetButton(button);
 

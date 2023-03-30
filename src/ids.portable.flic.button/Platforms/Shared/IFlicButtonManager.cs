@@ -1,6 +1,7 @@
 using System;
 using System.Threading.Tasks;
 using System.Threading;
+using IDS.Core.IDS_CAN;
 
 namespace IDS.Portable.Flic.Button.Platforms.Shared
 {
@@ -54,9 +55,9 @@ namespace IDS.Portable.Flic.Button.Platforms.Shared
 
         Task Init();
         Task<FlicButtonDeviceData?> ScanAndPairButton(CancellationToken cancellationToken);
-        void SubscribeToButtonEvents(string serialNumber, Action<FlicButtonEventData> flicEvent);
-        void ConnectButton(string serialNumber);
-        void DisconnectOrAbortPendingConnection(string serialNumber);
-        Task<bool> UnpairButton(string serialNumber);
+        void SubscribeToButtonEvents(MAC mac, Action<FlicButtonEventData> flicEvent);
+        void ConnectButton(MAC mac);
+        void DisconnectOrAbortPendingConnection(MAC mac);
+        Task<bool> UnpairButton(MAC mac);
     }
 }

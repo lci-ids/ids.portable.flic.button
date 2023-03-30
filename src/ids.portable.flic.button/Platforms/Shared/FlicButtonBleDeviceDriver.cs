@@ -109,12 +109,12 @@ namespace IDS.Portable.Flic.Button.Platforms.Shared
                 try
                 {
                     // Close any open connection
-                    FlicButtonManager.Instance.DisconnectOrAbortPendingConnection(SensorConnection.SerialNumber);
+                    FlicButtonManager.Instance.DisconnectOrAbortPendingConnection(SensorConnection.AccessoryMac);
 
-                    FlicButtonManager.Instance.SubscribeToButtonEvents(SensorConnection.SerialNumber, OnFlicButtonEventReceived);
+                    FlicButtonManager.Instance.SubscribeToButtonEvents(SensorConnection.AccessoryMac, OnFlicButtonEventReceived);
 
                     // Open Connection
-                    FlicButtonManager.Instance.ConnectButton(SensorConnection.SerialNumber);
+                    FlicButtonManager.Instance.ConnectButton(SensorConnection.AccessoryMac);
                 }
                 catch (Exception ex)
                 {
@@ -129,7 +129,7 @@ namespace IDS.Portable.Flic.Button.Platforms.Shared
             {
                 try
                 {
-                    FlicButtonManager.Instance.DisconnectOrAbortPendingConnection(SensorConnection.SerialNumber);
+                    FlicButtonManager.Instance.DisconnectOrAbortPendingConnection(SensorConnection.AccessoryMac);
                 }
                 catch (Exception e)
                 {
