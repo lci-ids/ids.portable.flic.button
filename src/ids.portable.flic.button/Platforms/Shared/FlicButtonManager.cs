@@ -1,4 +1,5 @@
-﻿using IDS.Portable.Common;
+﻿using IDS.Core.IDS_CAN;
+using IDS.Portable.Common;
 using IDS.Portable.Common.Utils;
 using IDS.Portable.LogicalDevice;
 using System;
@@ -58,22 +59,22 @@ namespace IDS.Portable.Flic.Button.Platforms.Shared
         /// </summary>
         /// <param name="serialNumber">The serial number of the device to subscribe to.</param>
         /// <param name="cancellationToken"></param>
-        public void SubscribeToButtonEvents(string serialNumber, Action<FlicButtonEventData> flicEvent) =>
-        _nativeFlicButtonManager.SubscribeToButtonEvents(serialNumber, flicEvent);
+        public void SubscribeToButtonEvents(MAC mac, Action<FlicButtonEventData> flicEvent) =>
+        _nativeFlicButtonManager.SubscribeToButtonEvents(mac, flicEvent);
 
         /// <summary>
         /// Attempts to connect to a flic button with the given serial number. Returns connection status via SubscribeToButtonEvents.
         /// </summary>
         /// <param name="serialNumber">The serial number of the device to connect to.</param>
-        public void ConnectButton(string serialNumber) =>
-            _nativeFlicButtonManager.ConnectButton(serialNumber);
+        public void ConnectButton(MAC mac) =>
+            _nativeFlicButtonManager.ConnectButton(mac);
 
         /// <summary>
         /// Disconnects or aborts a pending connection to a flic button with the given serial number.
         /// </summary>
         /// <param name="serialNumber">The serial number of the device to disconnect from.</param>
-        public void DisconnectOrAbortPendingConnection(string serialNumber) =>
-            _nativeFlicButtonManager.DisconnectOrAbortPendingConnection(serialNumber);
+        public void DisconnectOrAbortPendingConnection(MAC mac) =>
+            _nativeFlicButtonManager.DisconnectOrAbortPendingConnection(mac);
 
         /// <summary>
         /// Completely removes a button from the flic manager. It is important to call this before we finish removing the device
@@ -81,7 +82,7 @@ namespace IDS.Portable.Flic.Button.Platforms.Shared
         /// </summary>
         /// <param name="serialNumber">The serial number of the device to unpair from.</param>
         /// <returns>True if removing the button was successful.</returns>
-        public async Task<bool> UnpairButton(string serialNumber) =>
-            await _nativeFlicButtonManager.UnpairButton(serialNumber);
+        public async Task<bool> UnpairButton(MAC mac) =>
+            await _nativeFlicButtonManager.UnpairButton(mac);
     }
 }

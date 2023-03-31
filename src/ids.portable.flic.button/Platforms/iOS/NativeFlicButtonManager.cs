@@ -5,6 +5,8 @@ using System.Threading.Tasks;
 using System.Threading;
 using IDS.Portable.Common;
 using FlicLibraryIos;
+using IDS.Core.IDS_CAN;
+using IDS.Portable.LogicalDevice;
 
 namespace IDS.Portable.Flic.Button.Platforms.iOS
 {
@@ -104,7 +106,7 @@ namespace IDS.Portable.Flic.Button.Platforms.iOS
             return await tcs.TryWaitAsync(cancellationToken);
         }
 
-        public void SubscribeToButtonEvents(string serialNumber, Action<FlicButtonEventData> flicEvent)
+        public void SubscribeToButtonEvents(MAC mac, Action<FlicButtonEventData> flicEvent)
         {
             if (!_managerReady)
                 throw new FlicButtonManagerNotReadyException();
@@ -115,14 +117,14 @@ namespace IDS.Portable.Flic.Button.Platforms.iOS
                 throw new FlicButtonManagerNullException();
 
             var buttons = manager.Buttons;
-            var button = buttons.FirstOrDefault(button => button.SerialNumber == serialNumber);
+            var button = buttons.FirstOrDefault(button => button.BluetoothAddress.ToMAC() == mac);
             if (button is null)
-                throw new FlicButtonNullException($"No flic button found with the serial number: {serialNumber}");
+                throw new FlicButtonNullException($"No flic button found with the mac: {mac}");
 
             button.Delegate = new FlicButtonCallback(flicEvent);
         }
 
-        public void ConnectButton(string serialNumber)
+        public void ConnectButton(MAC mac)
         {
             if (!_managerReady)
                 throw new FlicButtonManagerNotReadyException();
@@ -133,14 +135,14 @@ namespace IDS.Portable.Flic.Button.Platforms.iOS
                 throw new FlicButtonManagerNullException();
 
             var buttons = manager.Buttons;
-            var button = buttons.FirstOrDefault(button => button.SerialNumber == serialNumber);
+            var button = buttons.FirstOrDefault(button => button.BluetoothAddress.ToMAC() == mac);
             if (button is null)
-                throw new FlicButtonNullException($"No flic button found with the serial number: {serialNumber}");
+                throw new FlicButtonNullException($"No flic button found with the mac: {mac}");
 
             button.Connect();
         }
 
-        public void DisconnectOrAbortPendingConnection(string serialNumber)
+        public void DisconnectOrAbortPendingConnection(MAC mac)
         {
             if (!_managerReady)
                 throw new FlicButtonManagerNotReadyException();
@@ -151,14 +153,14 @@ namespace IDS.Portable.Flic.Button.Platforms.iOS
                 throw new FlicButtonManagerNullException();
 
             var buttons = manager.Buttons;
-            var button = buttons.FirstOrDefault(button => button.SerialNumber == serialNumber);
+            var button = buttons.FirstOrDefault(button => button.BluetoothAddress.ToMAC() == mac);
             if (button is null)
-                throw new FlicButtonNullException($"No flic button found with the serial number: {serialNumber}");
+                throw new FlicButtonNullException($"No flic button found with the mac: {mac}");
 
             button.Disconnect();
         }
 
-        public async Task<bool> UnpairButton(string serialNumber)
+        public async Task<bool> UnpairButton(MAC mac)
         {
             if (!_managerReady)
                 throw new FlicButtonManagerNotReadyException();
@@ -169,9 +171,9 @@ namespace IDS.Portable.Flic.Button.Platforms.iOS
                 throw new FlicButtonManagerNullException();
 
             var buttons = manager.Buttons;
-            var button = buttons.FirstOrDefault(button => button.SerialNumber == serialNumber);
+            var button = buttons.FirstOrDefault(button => button.BluetoothAddress.ToMAC() == mac);
             if (button is null)
-                throw new FlicButtonNullException($"No flic button found with the serial number: {serialNumber}");
+                throw new FlicButtonNullException($"No flic button found with the mac: {mac}");
 
             var cts = new CancellationTokenSource(UnpairFlicButtonTimeoutMs);
             var cancellationToken = cts.Token;

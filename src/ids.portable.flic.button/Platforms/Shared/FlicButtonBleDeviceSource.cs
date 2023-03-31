@@ -136,6 +136,7 @@ namespace IDS.Portable.Flic.Button.Platforms.Shared
                     return false;
 
                 var flicButton = new FlicButtonBleDeviceDriver(this, sensorConnection);
+                flicButton.LogicalDevice?.AddDeviceSource(this);
 
                 var newRegistration = _registeredFlicButtons.TryAdd(bleDeviceId, flicButton);
                 if (newRegistration)
