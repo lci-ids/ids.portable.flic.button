@@ -8,12 +8,18 @@ namespace IDS.Portable.Flic.Button.Platforms.Android
     public static class PlatformInitializer
     {
         public static int NotificationIcon;
-        public static void Init(Context context)
+
+        public static void Init()
         {
             ServiceCollection.RegisterSingleton<IFlicButtonManager, NativeFlicButtonManager>();
             ServiceCollection.Init();
+        }
+        public static void Init(Context context)
+        {
+            Init();
             
-            Flic2Manager.Init(context, new Handler());
+            if (context is not null)
+                Flic2Manager.Init(context, new Handler());
         }
     }
 }
