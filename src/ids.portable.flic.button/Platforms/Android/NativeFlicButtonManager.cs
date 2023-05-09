@@ -7,11 +7,15 @@ using System.Threading.Tasks;
 using System.Threading;
 using IDS.Core.IDS_CAN;
 using IDS.Portable.LogicalDevice;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
 
 namespace IDS.Portable.Flic.Button.Platforms.Android
 {
     internal class NativeFlicButtonManager : IFlicButtonManager
     {
+        private readonly ConcurrentDictionary<MAC, List<FlicButtonListenerCallback>> _buttonListenerCallbacks = new();
+
         public NativeFlicButtonPlatform Platform => NativeFlicButtonPlatform.Android;
 
         public Task Init()
@@ -28,13 +32,16 @@ namespace IDS.Portable.Flic.Button.Platforms.Android
         public async Task<FlicButtonDeviceData?> ScanAndPairButton(CancellationToken cancellationToken)
         {
             var manager = Flic2Manager.Instance;
-
+            
             if (manager is null)
                 throw new FlicButtonManagerNullException();
 
             var tcs = new TaskCompletionSource<FlicButtonDeviceData?>();
 
             // One attempt is a 30 second scan.
+            foreach (var button in manager.Buttons)
+                await UnpairButton(button.BdAddr.ToMAC());
+            
             manager.StartScan(new FlicScanPairCallback(tcs));
 
             return await tcs.TryWaitAsync(cancellationToken);
@@ -52,7 +59,7 @@ namespace IDS.Portable.Flic.Button.Platforms.Android
             if (button is null)
                 throw new FlicButtonNullException($"No flic button found with the mac: {mac}");
 
-            button.AddListener(new FlicButtonListenerCallback(flicEvent));
+            AddButtonListenerCallback(mac, button, flicEvent);
         }
 
         public void ConnectButton(MAC mac)
@@ -66,7 +73,7 @@ namespace IDS.Portable.Flic.Button.Platforms.Android
             var button = buttons.FirstOrDefault(button => button.BdAddr.ToMAC() == mac);
             if (button is null)
                 throw new FlicButtonNullException($"No flic button found with the mac: {mac}");
-
+            
             button.Connect();
         }
 
@@ -81,6 +88,8 @@ namespace IDS.Portable.Flic.Button.Platforms.Android
             var button = buttons.FirstOrDefault(button => button.BdAddr.ToMAC() == mac);
             if (button is null)
                 throw new FlicButtonNullException($"No flic button found with the mac: {mac}");
+
+            RemoveButtonListenerCallback(mac, button);
 
             button.DisconnectOrAbortPendingConnection();
         }
@@ -97,12 +106,35 @@ namespace IDS.Portable.Flic.Button.Platforms.Android
             if (button is null)
                 throw new FlicButtonNullException($"No flic button found with the mac: {mac}");
 
+            RemoveButtonListenerCallback(mac, button);
+
             manager.ForgetButton(button);
 
             if (manager.Buttons.Contains(button))
                 return Task.FromResult(false);
 
             return Task.FromResult(true);
+        }
+
+        private void AddButtonListenerCallback(MAC mac, Flic2Button button, Action<FlicButtonEventData> flicEvent)
+        {
+            var buttonListenerCallback = new FlicButtonListenerCallback(flicEvent);
+
+            _buttonListenerCallbacks.TryAdd(mac, new List<FlicButtonListenerCallback>());
+            _buttonListenerCallbacks[mac].Add(buttonListenerCallback);
+
+            button.AddListener(buttonListenerCallback);
+        }
+
+        private void RemoveButtonListenerCallback(MAC mac, Flic2Button button)
+        {
+            if (_buttonListenerCallbacks.TryGetValue(mac, out var buttonListenerCallbacks) is false)
+                return;
+
+            foreach (var listenerCallback in buttonListenerCallbacks)
+                button.RemoveListener(listenerCallback);
+
+            _buttonListenerCallbacks.TryRemove(mac);
         }
     }
 }

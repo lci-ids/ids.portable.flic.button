@@ -9,6 +9,8 @@ using OneControl.Direct.IdsCanAccessoryBle.FlicButton;
 
 namespace IDS.Portable.Flic.Button.Platforms.Shared
 {
+    public delegate void UpdateFlicButtonReachabilityEventHandler(FlicButtonBleDeviceDriver echoBrakeControlBle);
+
     public class FlicButtonBleDeviceDriver : CommonDisposable, IFlicButtonBleDeviceDriver
     {
         private const string LogTag = nameof(FlicButtonBleDeviceDriver);
@@ -22,6 +24,8 @@ namespace IDS.Portable.Flic.Button.Platforms.Shared
         private readonly IFlicButtonBleDeviceSource _sourceDirect;   // This needs to be a IFlicButtonBleDeviceSource so the primary source can be looked up!
 
         public bool IsConnected { get; private set; } = false;
+
+        public event UpdateFlicButtonReachabilityEventHandler? UpdateFlicButtonReachabilityEvent;
 
         public SensorConnectionFlic SensorConnection { get; }
 
@@ -64,6 +68,7 @@ namespace IDS.Portable.Flic.Button.Platforms.Shared
         private void OnFlicButtonEventReceived(FlicButtonEventData flicButtonEventData)
         {
             IsConnected = flicButtonEventData.Connected;
+            UpdateFlicButtonReachabilityEvent?.Invoke(this);
 
             var status = new LogicalDeviceFlicButtonStatus();
             if (flicButtonEventData.IsSingleClick)
@@ -138,6 +143,7 @@ namespace IDS.Portable.Flic.Button.Platforms.Shared
 
                 IsConnected = false;
                 _isStarted = false;
+                UpdateFlicButtonReachabilityEvent?.Invoke(this);
             }
         }
 
