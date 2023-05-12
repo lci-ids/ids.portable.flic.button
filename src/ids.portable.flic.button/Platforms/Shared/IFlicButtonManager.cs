@@ -54,6 +54,7 @@ namespace IDS.Portable.Flic.Button.Platforms.Shared
         NativeFlicButtonPlatform Platform { get; }
 
         Task Init();
+        bool IsConnected { get; }
         Task<FlicButtonDeviceData?> ScanAndPairButton(CancellationToken cancellationToken);
         void SubscribeToButtonEvents(MAC mac, Action<FlicButtonEventData> flicEvent);
         void ConnectButton(MAC mac);

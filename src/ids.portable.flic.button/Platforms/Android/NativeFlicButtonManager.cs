@@ -16,7 +16,10 @@ namespace IDS.Portable.Flic.Button.Platforms.Android
     {
         private readonly ConcurrentDictionary<MAC, List<FlicButtonListenerCallback>> _buttonListenerCallbacks = new();
 
+        private Flic2Button? _flicButton;
+
         public NativeFlicButtonPlatform Platform => NativeFlicButtonPlatform.Android;
+        public bool IsConnected => _flicButton?.ConnectionState is Flic2Button.ConnectionStateConnectedReady;
 
         public Task Init()
         {
@@ -56,9 +59,8 @@ namespace IDS.Portable.Flic.Button.Platforms.Android
 
             var buttons = manager.Buttons;
             var button = buttons.FirstOrDefault(button => button.BdAddr.ToMAC() == mac);
-            if (button is null)
-                throw new FlicButtonNullException($"No flic button found with the mac: {mac}");
 
+            _flicButton = button ?? throw new FlicButtonNullException($"No flic button found with the mac: {mac}");
             AddButtonListenerCallback(mac, button, flicEvent);
         }
 

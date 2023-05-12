@@ -18,8 +18,10 @@ namespace IDS.Portable.Flic.Button.Platforms.iOS
         private const int UnpairFlicButtonTimeoutMs = 2000;
 
         private static bool _managerReady = false;
+        private FLICButton? _flicButton;
 
         public NativeFlicButtonPlatform Platform => NativeFlicButtonPlatform.Ios;
+        public bool IsConnected => _flicButton?.State is FLICButtonState.Connected;
 
         public async Task Init()
         {
@@ -95,6 +97,7 @@ namespace IDS.Portable.Flic.Button.Platforms.iOS
                     TaggedLog.Error(LogTag, $"Paired with flic button, SerialNumber: {button.SerialNumber} Mac: {button.BluetoothAddress} Uuid: {button.Uuid}.");
                     // We're complete and we don't have an error, our button is good to go.
                     tcs.TrySetResult(new FlicButtonDeviceData(button.Name ?? "", button.SerialNumber, button.BluetoothAddress, Convert.ToInt32(button.FirmwareRevision), button.Uuid));
+                    return;
                 }
 
                 // Failure.
@@ -118,9 +121,9 @@ namespace IDS.Portable.Flic.Button.Platforms.iOS
 
             var buttons = manager.Buttons;
             var button = buttons.FirstOrDefault(button => button.BluetoothAddress.ToMAC() == mac);
-            if (button is null)
-                throw new FlicButtonNullException($"No flic button found with the mac: {mac}");
 
+            _flicButton = button ?? throw new FlicButtonNullException($"No flic button found with the mac: {mac}");
+            button.Delegate = null;
             button.Delegate = new FlicButtonCallback(flicEvent);
         }
 
@@ -139,6 +142,9 @@ namespace IDS.Portable.Flic.Button.Platforms.iOS
             if (button is null)
                 throw new FlicButtonNullException($"No flic button found with the mac: {mac}");
 
+            if (button.State == FLICButtonState.Connected)
+                return;
+
             button.Connect();
         }
 
@@ -156,6 +162,9 @@ namespace IDS.Portable.Flic.Button.Platforms.iOS
             var button = buttons.FirstOrDefault(button => button.BluetoothAddress.ToMAC() == mac);
             if (button is null)
                 throw new FlicButtonNullException($"No flic button found with the mac: {mac}");
+
+            if (button.State is FLICButtonState.Disconnecting or FLICButtonState.Disconnected)
+                return;
 
             button.Disconnect();
         }
