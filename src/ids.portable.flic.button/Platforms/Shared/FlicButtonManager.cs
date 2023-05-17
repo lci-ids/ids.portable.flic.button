@@ -53,6 +53,10 @@ namespace IDS.Portable.Flic.Button.Platforms.Shared
         /// no device was paired.</returns>
         public async Task<FlicButtonDeviceData?> ScanAndPairButton(CancellationToken cancellationToken) =>
             await _nativeFlicButtonManager.ScanAndPairButton(cancellationToken);
+        
+        
+        public bool IsConnected => _nativeFlicButtonManager.IsConnected;
+
 
         /// <summary>
         /// Subscribes to a flic button's events with an Action that returns FlicButtonEventData information about the events.

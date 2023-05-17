@@ -6,27 +6,26 @@ using System;
 using System.Diagnostics;
 using OneControl.Devices.FlicButton;
 using OneControl.Direct.IdsCanAccessoryBle.FlicButton;
+using System.Threading.Tasks;
+using System.Threading;
 
 namespace IDS.Portable.Flic.Button.Platforms.Shared
 {
-    public class FlicButtonBleDeviceDriver : CommonDisposable, IFlicButtonBleDeviceDriver
+    public delegate void UpdateFlicButtonReachabilityEventHandler(FlicButtonBleDeviceDriver echoBrakeControlBle);
+
+    public class FlicButtonBleDeviceDriver : BackgroundOperation, ICommonDisposable, IFlicButtonBleDeviceDriver
     {
         private const string LogTag = nameof(FlicButtonBleDeviceDriver);
-
         private readonly object _lock = new();
-
-        private bool _isStarted;
-
-        public ILogicalDeviceFlicButton? LogicalDevice { get; private set; }
-
         private readonly IFlicButtonBleDeviceSource _sourceDirect;   // This needs to be a IFlicButtonBleDeviceSource so the primary source can be looked up!
-
-        public bool IsConnected { get; private set; } = false;
-
-        public SensorConnectionFlic SensorConnection { get; }
+        private const int SleepTimeMs = 2000;
 
         internal Guid BleDeviceId => SensorConnection.ConnectionGuid;
 
+        public ILogicalDeviceFlicButton? LogicalDevice { get; private set; }
+        public bool IsConnected { get; private set; } = false;
+        public event UpdateFlicButtonReachabilityEventHandler? UpdateFlicButtonReachabilityEvent;
+        public SensorConnectionFlic SensorConnection { get; }
         public MAC AccessoryMacAddress { get; }
 
         public FlicButtonBleDeviceDriver(IFlicButtonBleDeviceSource sourceDirect, SensorConnectionFlic sensorConnection)
@@ -64,6 +63,7 @@ namespace IDS.Portable.Flic.Button.Platforms.Shared
         private void OnFlicButtonEventReceived(FlicButtonEventData flicButtonEventData)
         {
             IsConnected = flicButtonEventData.Connected;
+            UpdateFlicButtonReachabilityEvent?.Invoke(this);
 
             var status = new LogicalDeviceFlicButtonStatus();
             if (flicButtonEventData.IsSingleClick)
@@ -97,20 +97,18 @@ namespace IDS.Portable.Flic.Button.Platforms.Shared
             return IsConnected ? LogicalDeviceReachability.Reachable : LogicalDeviceReachability.Unreachable;
         }
 
-        public void Start()
+        /// <summary>
+        /// Main background operation use Start() to start it and Stop() to stop it!
+        /// </summary>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        protected override async Task BackgroundOperationAsync(CancellationToken cancellationToken)
         {
-            lock (_lock)
+            while (!cancellationToken.IsCancellationRequested && !IsDisposed)
             {
-                if (_isStarted)
-                    return;
-
-                _isStarted = true;
-
                 try
                 {
                     // Close any open connection
-                    FlicButtonManager.Instance.DisconnectOrAbortPendingConnection(SensorConnection.AccessoryMac);
-
                     FlicButtonManager.Instance.SubscribeToButtonEvents(SensorConnection.AccessoryMac, OnFlicButtonEventReceived);
 
                     // Open Connection
@@ -120,30 +118,58 @@ namespace IDS.Portable.Flic.Button.Platforms.Shared
                 {
                     TaggedLog.Error(LogTag, $"Failed to connect to Flic Button, message: {ex.Message}");
                 }
-            }
-        }
 
-        public void Stop()
-        {
-            lock (_lock)
+                // Short delay to give the button time to connect.
+                await TaskExtension.TryDelay(SleepTimeMs, cancellationToken);
+
+                while (FlicButtonManager.Instance.IsConnected && !cancellationToken.IsCancellationRequested && !IsDisposed)
+                {
+                    await TaskExtension.TryDelay(SleepTimeMs, cancellationToken);
+                }
+            }
+
+            UpdateFlicButtonReachabilityEvent?.Invoke(this);
+
+            try
             {
-                try
-                {
-                    FlicButtonManager.Instance.DisconnectOrAbortPendingConnection(SensorConnection.AccessoryMac);
-                }
-                catch (Exception e)
-                {
-                    TaggedLog.Debug(LogTag, $"Problem disconnecting Flic Button: {e}");
-                }
-
-                IsConnected = false;
-                _isStarted = false;
+                FlicButtonManager.Instance.DisconnectOrAbortPendingConnection(SensorConnection.AccessoryMac);
+            }
+            catch (Exception e)
+            {
+                TaggedLog.Debug(LogTag, $"Problem disconnecting Flic Button: {e}");
             }
         }
 
-        public override void Dispose(bool disposing)
+        #region ICommonDisposable
+        private int _isDisposed;
+        public bool IsDisposed => (uint)_isDisposed > 0U;
+
+        public void TryDispose()
+        {
+            try
+            {
+                if (IsDisposed)
+                    return;
+                Dispose();
+            }
+            catch
+            {
+                /* ignored */
+            }
+        }
+
+        public void Dispose()
+        {
+            if (this.IsDisposed || Interlocked.Exchange(ref this._isDisposed, 1) != 0)
+                return;
+
+            this.Dispose(true);
+        }
+
+        public virtual void Dispose(bool disposing)
         {
             Stop();
         }
+        #endregion
     }
 }

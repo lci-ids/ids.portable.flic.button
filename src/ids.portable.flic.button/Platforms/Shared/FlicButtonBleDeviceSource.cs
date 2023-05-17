@@ -9,6 +9,7 @@ using IDS.Portable.LogicalDevice;
 using System.Collections.Concurrent;
 using System.Linq;
 using OneControl.Direct.IdsCanAccessoryBle.FlicButton;
+using OneControl.Devices.EchoBrakeControl;
 
 
 namespace IDS.Portable.Flic.Button.Platforms.Shared
@@ -136,8 +137,9 @@ namespace IDS.Portable.Flic.Button.Platforms.Shared
                     return false;
 
                 var flicButton = new FlicButtonBleDeviceDriver(this, sensorConnection);
+                flicButton.UpdateFlicButtonReachabilityEvent += DeviceReachabilityUpdated;
                 flicButton.LogicalDevice?.AddDeviceSource(this);
-
+                
                 var newRegistration = _registeredFlicButtons.TryAdd(bleDeviceId, flicButton);
                 if (newRegistration)
                     TaggedLog.Debug(LogTag, $"Register Flic Button {bleDeviceId}");
@@ -160,6 +162,7 @@ namespace IDS.Portable.Flic.Button.Platforms.Shared
             if (!_registeredFlicButtons.TryRemove(bleDeviceId, out var flicButton))
                 return;
 
+            flicButton.UpdateFlicButtonReachabilityEvent -= DeviceReachabilityUpdated;
             flicButton.TryDispose();  // This will also stop the brake control if it had been started
         }
 
