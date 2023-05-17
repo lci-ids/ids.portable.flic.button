@@ -43,8 +43,11 @@ namespace IDS.Portable.Flic.Button.Platforms.Android
 
             // One attempt is a 30 second scan.
             foreach (var button in manager.Buttons)
-                await UnpairButton(button.BdAddr.ToMAC());
-            
+            {
+                RemoveButtonListenerCallback(button.BdAddr.ToMAC(), button);
+                manager.ForgetButton(button);
+            }
+
             manager.StartScan(new FlicScanPairCallback(tcs));
 
             return await tcs.TryWaitAsync(cancellationToken);

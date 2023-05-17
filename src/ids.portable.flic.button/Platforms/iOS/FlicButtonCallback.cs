@@ -82,6 +82,7 @@ namespace IDS.Portable.Flic.Button.Platforms.iOS
             _flicEventData.WasQueued = queued;
             _flicEventData.Timestamp = age;
             _flicEventData.IsDown = true;
+            _flicEventData.IsUp = false;
 
             _flicEvent.Invoke(_flicEventData);
         }
@@ -105,6 +106,7 @@ namespace IDS.Portable.Flic.Button.Platforms.iOS
             _flicEventData.Timestamp = age;
             _flicEventData.IsDown = false;
             _flicEventData.IsHold = false;
+            _flicEventData.IsUp = true;
 
             _flicEvent.Invoke(_flicEventData);
         }

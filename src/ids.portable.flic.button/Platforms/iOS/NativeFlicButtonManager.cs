@@ -67,6 +67,9 @@ namespace IDS.Portable.Flic.Button.Platforms.iOS
             if (manager is null)
                 throw new FlicButtonManagerNullException();
 
+            foreach (var button in manager.Buttons)
+                manager.ForgetButton(button, (_, _) => { /* DO NOTHING */ });
+
             var tcs = new TaskCompletionSource<FlicButtonDeviceData?>();
 
             manager.ScanForButtonsWithStateChangeHandler((scannerStatus) =>
