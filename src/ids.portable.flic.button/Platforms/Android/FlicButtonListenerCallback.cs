@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using IDS.Portable.Flic.Button.Platforms.Shared;
+using Java.Util.Logging;
 
 namespace IDS.Portable.Flic.Button.Platforms.Android
 {
@@ -52,6 +53,8 @@ namespace IDS.Portable.Flic.Button.Platforms.Android
             base.OnButtonClickOrHold(button, wasQueued, lastQueued, timestamp, isClick, isHold);
             TaggedLog.Debug(LogTag, $"Button click or hold event: isClick: {isClick} isHold: {isHold}.");
 
+            UpdateButtonState(button);
+
             _flicEventData.WasQueued = wasQueued;
             _flicEventData.LastQueued = lastQueued;
             _flicEventData.Timestamp = timestamp;
@@ -66,6 +69,8 @@ namespace IDS.Portable.Flic.Button.Platforms.Android
             base.OnButtonSingleOrDoubleClick(button, wasQueued, lastQueued, timestamp, isSingleClick, isDoubleClick);
             TaggedLog.Debug(LogTag, $"Button single or double click event: isSingleClick: {isSingleClick} isDoubleClick: {isDoubleClick}.");
 
+            UpdateButtonState(button);
+
             _flicEventData.WasQueued = wasQueued;
             _flicEventData.LastQueued = lastQueued;
             _flicEventData.Timestamp = timestamp;
@@ -79,6 +84,8 @@ namespace IDS.Portable.Flic.Button.Platforms.Android
         {
             base.OnButtonSingleOrDoubleClickOrHold(button, wasQueued, lastQueued, timestamp, isSingleClick, isDoubleClick, isHold);
             TaggedLog.Debug(LogTag, $"Button single, double click, or hold event: isSingleClick: {isSingleClick} isDoubleClick: {isDoubleClick} isHold: {isHold}.");
+
+            UpdateButtonState(button);
 
             _flicEventData.WasQueued = wasQueued;
             _flicEventData.LastQueued = lastQueued;
@@ -95,6 +102,8 @@ namespace IDS.Portable.Flic.Button.Platforms.Android
             base.OnButtonUpOrDown(button, wasQueued, lastQueued, timestamp, isUp, isDown);
             TaggedLog.Debug(LogTag, $"Button up or down event: isUp: {isUp} isDown: {isDown}.");
 
+            UpdateButtonState(button);
+
             _flicEventData.WasQueued = wasQueued;
             _flicEventData.LastQueued = lastQueued;
             _flicEventData.Timestamp = timestamp;
@@ -109,10 +118,22 @@ namespace IDS.Portable.Flic.Button.Platforms.Android
             base.OnBatteryLevelUpdated(button, level);
             TaggedLog.Debug(LogTag, $"Button battery level updated: level: {level.EstimatedPercentage}% .");
 
+            UpdateButtonState(button);
+
             _flicEventData.BatteryLevelPercent = level.EstimatedPercentage;
             _flicEventData.BatteryVoltage = level.Voltage;
 
             _flicEvent.Invoke(_flicEventData);
+        }
+
+        private void UpdateButtonState(Flic2Button button)
+        {
+            // For the properties below, we can't rely on specific events because we can easily miss
+            // them by not having the button listener setup, so we need to set them using the current button state.
+            //
+            _flicEventData.Connected = button.ConnectionState is Flic2Button.ConnectionStateConnectedReady;
+            _flicEventData.BatteryLevelPercent = button.LastKnownBatteryLevel.EstimatedPercentage;
+            _flicEventData.BatteryVoltage = button.LastKnownBatteryLevel.Voltage;
         }
     }
 }

@@ -55,6 +55,8 @@ namespace IDS.Portable.Flic.Button.Platforms.iOS
         {
             TaggedLog.Debug(LogTag, $"ButtonDidReceiveButtonClick.");
 
+            UpdateButtonState(button);
+
             _flicEventData.WasQueued = queued;
             _flicEventData.Timestamp = age;
             _flicEventData.IsSingleClick = true;
@@ -66,6 +68,8 @@ namespace IDS.Portable.Flic.Button.Platforms.iOS
         public override void ButtonDidReceiveButtonDoubleClick(FLICButton button, bool queued, nint age)
         {
             TaggedLog.Debug(LogTag, $"ButtonDidReceiveButtonDoubleClick.");
+
+            UpdateButtonState(button);
 
             _flicEventData.WasQueued = queued;
             _flicEventData.Timestamp = age;
@@ -79,6 +83,8 @@ namespace IDS.Portable.Flic.Button.Platforms.iOS
         {
             TaggedLog.Debug(LogTag, $"ButtonDidReceiveButtonDown.");
 
+            UpdateButtonState(button);
+
             _flicEventData.WasQueued = queued;
             _flicEventData.Timestamp = age;
             _flicEventData.IsDown = true;
@@ -91,6 +97,8 @@ namespace IDS.Portable.Flic.Button.Platforms.iOS
         {
             TaggedLog.Debug(LogTag, $"ButtonDidReceiveButtonHold.");
 
+            UpdateButtonState(button);
+
             _flicEventData.WasQueued = queued;
             _flicEventData.Timestamp = age;
             _flicEventData.IsHold = true;
@@ -101,6 +109,8 @@ namespace IDS.Portable.Flic.Button.Platforms.iOS
         public override void ButtonDidReceiveButtonUp(FLICButton button, bool queued, nint age)
         {
             TaggedLog.Debug(LogTag, $"ButtonDidReceiveButtonUp.");
+
+            UpdateButtonState(button);
 
             _flicEventData.WasQueued = queued;
             _flicEventData.Timestamp = age;
@@ -124,6 +134,8 @@ namespace IDS.Portable.Flic.Button.Platforms.iOS
         {
             TaggedLog.Debug(LogTag, $"ButtonDidUpdateBatteryVoltage: {voltage}.");
 
+            UpdateButtonState(button);
+
             _flicEventData.BatteryVoltage = voltage;
 
             _flicEvent.Invoke(_flicEventData);
@@ -133,7 +145,18 @@ namespace IDS.Portable.Flic.Button.Platforms.iOS
         {
             TaggedLog.Debug(LogTag, $"ButtonDidUpdateNickname: {nickname}.");
 
+            UpdateButtonState(button);
+
             _flicEvent.Invoke(_flicEventData);
+        }
+
+        private void UpdateButtonState(FLICButton button)
+        {
+            // For the properties below, we can't rely on specific events because we can easily miss
+            // them by not having the button listener setup, so we need to set them using the current button state.
+            //
+            _flicEventData.Connected = button.State is FLICButtonState.Connected;
+            _flicEventData.BatteryVoltage = button.BatteryVoltage;
         }
     }
 }
