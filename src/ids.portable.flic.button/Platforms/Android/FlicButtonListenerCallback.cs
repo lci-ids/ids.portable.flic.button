@@ -1,10 +1,7 @@
 ﻿using IDS.Portable.Common;
+using IDS.Portable.Flic.Button.Platforms.Shared;
 using IO.Flic.Flic2libandroid;
 using System;
-using System.Collections.Generic;
-using System.Text;
-using IDS.Portable.Flic.Button.Platforms.Shared;
-using Java.Util.Logging;
 
 namespace IDS.Portable.Flic.Button.Platforms.Android
 {
