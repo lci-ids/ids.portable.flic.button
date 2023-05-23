@@ -35,7 +35,7 @@ namespace IDS.Portable.Flic.Button.Platforms.Android
         public async Task<FlicButtonDeviceData?> ScanAndPairButton(CancellationToken cancellationToken)
         {
             var manager = Flic2Manager.Instance;
-            
+
             if (manager is null)
                 throw new FlicButtonManagerNullException();
 
@@ -78,7 +78,7 @@ namespace IDS.Portable.Flic.Button.Platforms.Android
             var button = buttons.FirstOrDefault(button => button.BdAddr.ToMAC() == mac);
             if (button is null)
                 throw new FlicButtonNullException($"No flic button found with the mac: {mac}");
-            
+
             button.Connect();
         }
 
@@ -126,6 +126,16 @@ namespace IDS.Portable.Flic.Button.Platforms.Android
             var buttonListenerCallback = new FlicButtonListenerCallback(flicEvent);
 
             _buttonListenerCallbacks.TryAdd(mac, new List<FlicButtonListenerCallback>());
+
+            // On iOS the button supports only one listener and due to the disconnect issue
+            // we keep assigning the delegate every time we notice the button being disconnected without
+            // the need to "unsubscribe" first.On Android the button supports multiple listeners and without
+            // an explicit "Unsubscribe" method we run the risk of constantly creating more listeners from
+            // the same caller, so until we update iOS to support multiple listners we will only allow 1 listener on Android.
+            //
+            if (_buttonListenerCallbacks[mac].Count > 0)
+                return;
+
             _buttonListenerCallbacks[mac].Add(buttonListenerCallback);
 
             button.AddListener(buttonListenerCallback);
