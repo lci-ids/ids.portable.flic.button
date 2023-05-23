@@ -126,6 +126,18 @@ namespace IDS.Portable.Flic.Button.Platforms.Shared
             return null;
         }
 
+        /// <summary>
+        /// Unpairs the given flic button from the phone.
+        /// </summary>
+        /// <param name="mac">The MAC Address of the flic button to be unpaired.</param>
+        /// <returns>
+        /// True if it was successful unpairing the flic button, false otherwise.
+        /// </returns>
+        public async Task<bool> UnpairFlicButtonAsync(MAC mac)
+        {
+            return await FlicButtonManager.Instance.UnpairButton(mac);
+        }
+
         public bool RegisterSensor(SensorConnectionFlic sensorConnection)
         {
             if (sensorConnection?.ConnectionGuid is not { } bleDeviceId)
