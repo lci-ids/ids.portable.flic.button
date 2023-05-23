@@ -132,7 +132,8 @@ namespace IDS.Portable.Flic.Button.Platforms.Shared
 
             try
             {
-                FlicButtonManager.Instance.DisconnectOrAbortPendingConnection(SensorConnection.AccessoryMac);
+                if(FlicButtonManager.Instance.IsConnected)
+                    FlicButtonManager.Instance.DisconnectOrAbortPendingConnection(SensorConnection.AccessoryMac);
             }
             catch (Exception e)
             {
