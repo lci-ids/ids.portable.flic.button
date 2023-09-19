@@ -48,8 +48,8 @@ namespace IDS.Portable.Flic.Button.Platforms.Shared
             }
 
             TaggedLog.Information(LogTag, $"Creating Logical Device for Flic Button");
-            // TODO: Add correct Product ID once it's added in Core.
-            var logicalDeviceId = new LogicalDeviceId(DEVICE_TYPE.BUTTON_FLIC, 0x00, FUNCTION_NAME.TRAILER_BRAKE_CONTROLLER, 0x00, PRODUCT_ID.LCI_ONECONTROL_ANDROID_MOBILE_APPLICATION, AccessoryMacAddress);
+
+            var logicalDeviceId = new LogicalDeviceId(DEVICE_TYPE.BUTTON_FLIC, 0x00, FUNCTION_NAME.TRAILER_BRAKE_CONTROLLER, 0x00, PRODUCT_ID.FLIC_BUTTON, AccessoryMacAddress);
             var logicalDevice = _sourceDirect.DeviceService.DeviceManager?.AddLogicalDevice(logicalDeviceId, 0, _sourceDirect, isAttemptAutoRenameEnabled: (ld) => true);
             if (logicalDevice is not ILogicalDeviceFlicButton logicalDeviceFlicButton || logicalDevice.IsDisposed)
             {
