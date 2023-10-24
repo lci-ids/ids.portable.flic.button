@@ -45,13 +45,12 @@
     <None Remove="Platforms\Shared\FlicScanPairCallback.cs" />
     <None Remove="Platforms\Shared\IFlicButtonManager.cs" />
 
-    <PackageReference Include="IDS.Plugin.BLE" Version="3.2.*" />
     <PackageReference Include="ids.portable.common" Version="3.*" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="7.0.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" /> <!-- use 2.2.0-pre2 for UWP -->
     <PackageReference Include="System.Reactive" Version="5.0.0" />
     <PackageReference Include="System.Threading.Tasks.Dataflow" Version="7.0.0" />
-    <PackageReference Include="Xamarin.Essentials" Version="1.7.7" />
+    <PackageReference Include="Xamarin.Essentials" Version="1.8.0" />
   </ItemGroup>
 
   <ItemGroup Condition="!Exists('..\..\..\ids.portable.logicaldevices\IDS.Portable.LogicalDevices.csproj')">
